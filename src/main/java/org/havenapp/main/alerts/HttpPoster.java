@@ -21,7 +21,7 @@ import java.util.Map;
  * {@link HttpURLConnection}; when {@code tor} is set, tunnels TCP through Orbot's local
  * SOCKS proxy (127.0.0.1:9050).
  */
-final class HttpPoster {
+public final class HttpPoster {
 
     private static final int CONNECT_TIMEOUT_MS = 15000;
     private static final int READ_TIMEOUT_MS = 30000;
@@ -105,8 +105,19 @@ final class HttpPoster {
         }
     }
 
+    /** Simple GET. */
+    public static String get(String urlStr, boolean tor) throws Exception {
+        HttpURLConnection c = open(urlStr, tor);
+        try {
+            c.setRequestMethod("GET");
+            return finish(c);
+        } finally {
+            c.disconnect();
+        }
+    }
+
     /** Raw PUT of bytes (ntfy). Headers must be ASCII-safe. */
-    static String put(String urlStr, Map<String, String> headers, byte[] body, boolean tor) throws Exception {
+    public static String put(String urlStr, Map<String, String> headers, byte[] body, boolean tor) throws Exception {
         HttpURLConnection c = open(urlStr, tor);
         try {
             c.setRequestMethod("PUT");

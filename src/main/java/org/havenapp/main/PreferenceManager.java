@@ -341,6 +341,14 @@ public class PreferenceManager {
         prefsEditor.commit();
     }
 
+    public boolean getMeshEnabled() {
+        return appSharedPrefs.getBoolean("mesh_enabled", false);
+    }
+
+    public String getMeshDeviceName() {
+        return appSharedPrefs.getString("mesh_device_name", "");
+    }
+
     public boolean getRemoteCommandsEnabled() {
         return appSharedPrefs.getBoolean("remote_commands_enabled", false);
     }

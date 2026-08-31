@@ -69,6 +69,8 @@ class HousekeepingWorker(
             if (prefs.usageReportEnabled) {
                 UsageReporter(ctx).buildDailyDigest(8)?.let { alerts.sendAlert(it, null, -1) }
             }
+
+            org.havenapp.main.mesh.MeshMonitor.tick(ctx)
         } catch (e: Exception) {
             Log.e(TAG, "housekeeping failed", e)
         } finally {

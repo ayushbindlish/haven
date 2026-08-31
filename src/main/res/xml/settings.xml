@@ -385,6 +385,21 @@
             android:title="@string/alerts_via_tor"
             android:summary="@string/alerts_via_tor_hint" />
 
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="mesh_enabled"
+            android:title="@string/mesh_title"
+            android:summary="@string/mesh_summary" />
+
+        <EditTextPreference
+            app:iconSpaceReserved="false"
+            android:dialogLayout="@layout/pref_dialog_edit_text"
+            android:inputType="text"
+            android:key="mesh_device_name"
+            android:title="@string/mesh_name_title"
+            android:summary="@string/mesh_name_summary" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

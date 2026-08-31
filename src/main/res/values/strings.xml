@@ -277,6 +277,10 @@
     <string name="ntfy_topic_hint">A hard-to-guess topic name you subscribe to in the ntfy app</string>
     <string name="alerts_via_tor">Route network alerts via Orbot</string>
     <string name="alerts_via_tor_hint">Send Telegram / ntfy traffic through Tor (requires Orbot running)</string>
+    <string name="mesh_title">Watch my other Haven devices</string>
+    <string name="mesh_summary">Devices sharing this ntfy topic check on each other; alert if one goes quiet</string>
+    <string name="mesh_name_title">This device\'s name in the mesh</string>
+    <string name="mesh_name_summary">Defaults to the phone model</string>
 
     <string name="power_mode_title">Power mode</string>
     <string name="power_mode_summary">How aggressively Haven saves battery when nothing is happening</string>
