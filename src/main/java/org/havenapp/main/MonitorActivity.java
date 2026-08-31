@@ -19,13 +19,11 @@ package org.havenapp.main;
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
-import android.app.PictureInPictureParams;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -344,20 +342,6 @@ public class MonitorActivity extends AppCompatActivity implements TimePickerDial
         }
     }
 
-    @Override
-    public void onPictureInPictureModeChanged (boolean isInPictureInPictureMode, Configuration newConfig) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
-        }
-        if (isInPictureInPictureMode) {
-            // Hide the full-screen UI (controls, etc.) while in picture-in-picture mode.
-            findViewById(R.id.buttonBar).setVisibility(View.GONE);
-        } else {
-            // Restore the full-screen UI.
-            findViewById(R.id.buttonBar).setVisibility(View.VISIBLE);
-
-        }
-    }
 
     private void showSettings() {
 
@@ -466,35 +450,18 @@ public class MonitorActivity extends AppCompatActivity implements TimePickerDial
     }
 
 
-    @Override
-    public void onUserLeaveHint () {
-        if (mIsMonitoring) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                enterPictureInPictureMode(new PictureInPictureParams.Builder().build());
-            }
-        }
-    }
     /**
-     * When user closes the activity
+     * When the user leaves the activity: monitoring keeps running in MonitorService
+     * (foreground, camera + sensors), so just drop to the background rather than tearing
+     * the Activity down abruptly.
      */
     @Override
     public void onBackPressed() {
-
         if (mIsMonitoring) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                enterPictureInPictureMode(new PictureInPictureParams.Builder().build());
-            }
-            else
-            {
-                finish();
-            }
-        }
-        else
-        {
+            moveTaskToBack(true);
+        } else {
             finish();
         }
-
-
     }
 
     private void showTimeDelayDialog() {
@@ -543,13 +510,10 @@ public class MonitorActivity extends AppCompatActivity implements TimePickerDial
 
         isBlankScreenActive = true;
 
-        // DON'T stop camera - just make the fragment tiny instead
-        View cameraFragmentView = findViewById(R.id.fragment_camera);
-        if (cameraFragmentView != null) {
-            ViewGroup.LayoutParams params = cameraFragmentView.getLayoutParams();
-            params.width = 1;
-            params.height = 1;
-            cameraFragmentView.setLayoutParams(params);
+        // The camera runs in the service now, so blanking is purely cosmetic: black the
+        // screen and drop brightness so the phone doesn't look like it's doing anything.
+        if (mFragmentCamera != null) {
+            mFragmentCamera.stopCamera();
         }
 
         // Hide all UI elements
@@ -594,7 +558,7 @@ public class MonitorActivity extends AppCompatActivity implements TimePickerDial
         rootView.addView(blankOverlay);
         blankOverlay.setTag("blank_overlay");
 
-        Log.d("MonitorActivity", "Screen blanked - camera still running with 1x1 view");
+        Log.d("MonitorActivity", "Screen blanked (monitoring continues in the service)");
         Toast.makeText(this, "Double-tap to restore screen", Toast.LENGTH_LONG).show();
     }
 
@@ -608,15 +572,6 @@ public class MonitorActivity extends AppCompatActivity implements TimePickerDial
         View overlay = rootView.findViewWithTag("blank_overlay");
         if (overlay != null) {
             rootView.removeView(overlay);
-        }
-
-        // Restore camera fragment to full size
-        View cameraFragmentView = findViewById(R.id.fragment_camera);
-        if (cameraFragmentView != null) {
-            ViewGroup.LayoutParams params = cameraFragmentView.getLayoutParams();
-            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            params.height = ViewGroup.LayoutParams.MATCH_PARENT;
-            cameraFragmentView.setLayoutParams(params);
         }
 
         // Restore UI elements

@@ -142,6 +142,7 @@ dependencies {
     implementation "androidx.camera:camera-camera2:$camerax_version"
     implementation "androidx.camera:camera-lifecycle:$camerax_version"
     implementation "androidx.camera:camera-video:$camerax_version"
+    implementation "androidx.camera:camera-view:$camerax_version"
     implementation 'androidx.lifecycle:lifecycle-service:2.9.2'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.9.2'
     implementation 'androidx.appcompat:appcompat:1.7.1'
@@ -194,7 +195,4 @@ dependencies {
 
     // Periodic background work (storage cleanup). Replaces the unmaintained
     // com.evernote:android-job. work-runtime is already forced to 2.8.1 above.
-
-    // new camera view: https://github.com/natario1/CameraView
-    implementation 'com.otaliastudios:cameraview:2.7.2'
 }

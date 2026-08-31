@@ -5,25 +5,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:foreground="@color/translucentOverlay25">
 
-    <!-- Camera -->
-    <com.otaliastudios.cameraview.CameraView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <!-- Camera preview (CameraX) -->
+    <androidx.camera.view.PreviewView
         android:id="@+id/camera_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:keepScreenOn="true"
-        app:cameraExperimental="true"
-        app:cameraPlaySounds="false"
-        app:cameraGrid="off"
-        app:cameraFlash="off"
-        app:cameraAudio="on"
-        app:cameraGestureTap="none"
-        app:cameraGestureLongTap="none"
-        app:cameraGesturePinch="none"
-        app:cameraGestureScrollHorizontal="none"
-        app:cameraGestureScrollVertical="none"
-        app:cameraMode="picture" />
+        app:scaleType="fitCenter" />
 
     <ImageView
         android:id="@+id/new_image"
