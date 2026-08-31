@@ -314,6 +314,8 @@ public class MonitorService extends LifecycleService implements SensorTriggerSin
         mCoordinator = new SensingCoordinator(this, this, this);
         mCoordinator.start();
 
+        WatchdogWorker.start(this);
+
         if (mPrefs.getLocationTrackingEnabled()) {
             mLocationTracker = new org.havenapp.main.location.LocationTracker(this);
             mLocationTracker.start();
@@ -347,6 +349,7 @@ public class MonitorService extends LifecycleService implements SensorTriggerSin
         if (mPrefs.getMonitorServiceActive()) {
             mPrefs.activateMonitorService(false);
         }
+        WatchdogWorker.stop(this);
 
         if (mPowerReceiver != null) {
             try {
