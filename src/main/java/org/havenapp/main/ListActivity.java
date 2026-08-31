@@ -382,15 +382,11 @@ public class ListActivity extends AppCompatActivity {
 
     private void testNotifications ()
     {
-
-        if (preferences.isSignalVerified()) {
-            SignalSender sender = SignalSender.getInstance(this, preferences.getSignalUsername().trim());
-            ArrayList<String> recip = new ArrayList<>();
-            recip.add(preferences.getRemotePhoneNumber());
-            sender.sendMessage(recip, resourceManager.getString(R.string.signal_test_message),
-                    null, null);
-        } else {
-            Toast.makeText(this, getString(R.string.setup_signal_toast), Toast.LENGTH_SHORT).show();
-        }
+        int fired = new org.havenapp.main.alerts.AlertManager(this)
+                .sendTest(resourceManager.getString(R.string.signal_test_message));
+        Toast.makeText(this,
+                fired > 0 ? getString(R.string.alert_test_sent, fired)
+                          : getString(R.string.alert_test_none),
+                Toast.LENGTH_SHORT).show();
     }
 }

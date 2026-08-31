@@ -24,37 +24,10 @@ public class SignalAlertChannel implements AlertChannel {
     public SignalAlertChannel(Context context) {
         this.context = context;
         this.prefs = new PreferenceManager(context);
-        initializeSignalProtocol();
-    }
-
-    private void initializeSignalProtocol() {
-        try {
-            // Initialize Signal Protocol Store
-//            protocolStore = new HavenSignalProtocolStore(context);
-
-            // Generate identity keys if not exist
-            if (protocolStore.getIdentityKeyPair() == null) {
-                IdentityKeyPair identityKeyPair = KeyHelper.generateIdentityKeyPair();
-                int registrationId = KeyHelper.generateRegistrationId(false);
-
-                // Store identity and registration
-                protocolStore.saveIdentity(new SignalProtocolAddress("self", 1),
-                        identityKeyPair.getPublicKey());
-
-                // Generate and store prekeys
-                List<PreKeyRecord> preKeys = KeyHelper.generatePreKeys(1, 100);
-                for (PreKeyRecord preKey : preKeys) {
-                    protocolStore.storePreKey(preKey.getId(), preKey);
-                }
-
-                // Generate and store signed prekey
-                SignedPreKeyRecord signedPreKey = KeyHelper.generateSignedPreKey(
-                        identityKeyPair, 1);
-                protocolStore.storeSignedPreKey(signedPreKey.getId(), signedPreKey);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to initialize Signal Protocol", e);
-        }
+        // Signal integration is not wired up in this build (no signal-cli backend / no
+        // registered number). Left as a stub so the AlertChannel plumbing stays intact;
+        // isAvailable() returns false so it is never used. See the plan's Phase 4 notes -
+        // Telegram + ntfy cover the "encrypted push with media" need for now.
     }
 
     @Override

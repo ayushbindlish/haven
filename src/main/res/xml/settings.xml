@@ -187,4 +187,64 @@
             android:title="@string/password" />
     </PreferenceCategory>
 
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        android:title="@string/network_alerts">
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="telegram_enabled"
+            android:title="@string/telegram_enabled"
+            android:summary="@string/telegram_summary" />
+
+        <EditTextPreference
+            app:iconSpaceReserved="false"
+            android:dialogLayout="@layout/pref_dialog_edit_text"
+            android:inputType="text"
+            android:key="telegram_bot_token"
+            android:title="@string/telegram_token"
+            android:summary="@string/telegram_token_hint" />
+
+        <EditTextPreference
+            app:iconSpaceReserved="false"
+            android:dialogLayout="@layout/pref_dialog_edit_text"
+            android:inputType="text"
+            android:key="telegram_chat_id"
+            android:title="@string/telegram_chat"
+            android:summary="@string/telegram_chat_hint" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="ntfy_enabled"
+            android:title="@string/ntfy_enabled"
+            android:summary="@string/ntfy_summary" />
+
+        <EditTextPreference
+            app:iconSpaceReserved="false"
+            android:dialogLayout="@layout/pref_dialog_edit_text"
+            android:inputType="textUri"
+            android:defaultValue="https://ntfy.sh"
+            android:key="ntfy_server"
+            android:title="@string/ntfy_server"
+            android:summary="@string/ntfy_server_hint" />
+
+        <EditTextPreference
+            app:iconSpaceReserved="false"
+            android:dialogLayout="@layout/pref_dialog_edit_text"
+            android:inputType="text"
+            android:key="ntfy_topic"
+            android:title="@string/ntfy_topic"
+            android:summary="@string/ntfy_topic_hint" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="alerts_via_tor"
+            android:title="@string/alerts_via_tor"
+            android:summary="@string/alerts_via_tor_hint" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

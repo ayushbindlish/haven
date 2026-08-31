@@ -59,6 +59,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
+        // Read/write the same SharedPreferences file PreferenceManager uses, so
+        // preference widgets bind directly to app settings without a manual bridge.
+        getPreferenceManager().setSharedPreferencesName("org.havenapp.main");
+        getPreferenceManager().setSharedPreferencesMode(android.content.Context.MODE_PRIVATE);
         addPreferencesFromResource(R.xml.settings);
         mActivity = (AppCompatActivity) getActivity();
         preferences = new PreferenceManager(mActivity);

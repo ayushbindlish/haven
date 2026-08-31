@@ -193,6 +193,72 @@ public class PreferenceManager {
         prefsEditor.commit();
     }
 
+    // Telegram Bot API preferences
+    public boolean getTelegramEnabled() {
+        return appSharedPrefs.getBoolean("telegram_enabled", false);
+    }
+
+    public void setTelegramEnabled(boolean enabled) {
+        prefsEditor.putBoolean("telegram_enabled", enabled);
+        prefsEditor.commit();
+    }
+
+    public String getTelegramBotToken() {
+        return appSharedPrefs.getString("telegram_bot_token", "");
+    }
+
+    public void setTelegramBotToken(String token) {
+        prefsEditor.putString("telegram_bot_token", token == null ? "" : token.trim());
+        prefsEditor.commit();
+    }
+
+    public String getTelegramChatId() {
+        return appSharedPrefs.getString("telegram_chat_id", "");
+    }
+
+    public void setTelegramChatId(String chatId) {
+        prefsEditor.putString("telegram_chat_id", chatId == null ? "" : chatId.trim());
+        prefsEditor.commit();
+    }
+
+    // ntfy preferences
+    public boolean getNtfyEnabled() {
+        return appSharedPrefs.getBoolean("ntfy_enabled", false);
+    }
+
+    public void setNtfyEnabled(boolean enabled) {
+        prefsEditor.putBoolean("ntfy_enabled", enabled);
+        prefsEditor.commit();
+    }
+
+    public String getNtfyServer() {
+        return appSharedPrefs.getString("ntfy_server", "https://ntfy.sh");
+    }
+
+    public void setNtfyServer(String server) {
+        prefsEditor.putString("ntfy_server", server == null ? "" : server.trim());
+        prefsEditor.commit();
+    }
+
+    public String getNtfyTopic() {
+        return appSharedPrefs.getString("ntfy_topic", "");
+    }
+
+    public void setNtfyTopic(String topic) {
+        prefsEditor.putString("ntfy_topic", topic == null ? "" : topic.trim());
+        prefsEditor.commit();
+    }
+
+    /** Route outbound HTTP alerts (Telegram / ntfy) through Orbot's SOCKS proxy. */
+    public boolean getAlertsViaTor() {
+        return appSharedPrefs.getBoolean("alerts_via_tor", false);
+    }
+
+    public void setAlertsViaTor(boolean via) {
+        prefsEditor.putBoolean("alerts_via_tor", via);
+        prefsEditor.commit();
+    }
+
     // Session preferences
     public String getSessionId() {
         return appSharedPrefs.getString("session_id", "");

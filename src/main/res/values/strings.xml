@@ -184,6 +184,25 @@
     <string name="configure_sensors_title">Configure Sensors</string>
     <string name="sensors_configured">Sensors configured successfully!</string>
 
+    <string name="alert_test_sent">Test alert sent via %1$d channel(s)</string>
+    <string name="alert_test_none">No alert channels are enabled and configured</string>
+
+    <string name="network_alerts">Network alerts</string>
+    <string name="telegram_enabled">Telegram</string>
+    <string name="telegram_summary">Send alerts (with photo/video/audio) to a Telegram bot chat. Not end-to-end encrypted.</string>
+    <string name="telegram_token">Bot token</string>
+    <string name="telegram_token_hint">From @BotFather, e.g. 123456:ABC-DEF…</string>
+    <string name="telegram_chat">Chat ID</string>
+    <string name="telegram_chat_hint">Your numeric chat id (message @userinfobot to get it)</string>
+    <string name="ntfy_enabled">ntfy</string>
+    <string name="ntfy_summary">Push alerts to an ntfy topic — public server or your own.</string>
+    <string name="ntfy_server">ntfy server</string>
+    <string name="ntfy_server_hint">https://ntfy.sh or your self-hosted URL</string>
+    <string name="ntfy_topic">ntfy topic</string>
+    <string name="ntfy_topic_hint">A hard-to-guess topic name you subscribe to in the ntfy app</string>
+    <string name="alerts_via_tor">Route network alerts via Orbot</string>
+    <string name="alerts_via_tor_hint">Send Telegram / ntfy traffic through Tor (requires Orbot running)</string>
+
     <string name="power_mode_title">Power mode</string>
     <string name="power_mode_summary">How aggressively Haven saves battery when nothing is happening</string>
     <string name="power_mode_continuous">Continuous — all sensors always on (best plugged in)</string>
