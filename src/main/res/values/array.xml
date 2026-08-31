@@ -10,4 +10,14 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+    <string-array name="power_mode_entries">
+        <item>@string/power_mode_continuous</item>
+        <item>@string/power_mode_adaptive</item>
+        <item>@string/power_mode_battery_saver</item>
+    </string-array>
+    <string-array name="power_mode_values">
+        <item>continuous</item>
+        <item>adaptive</item>
+        <item>battery_saver</item>
+    </string-array>
 </resources>

@@ -123,30 +123,11 @@ public class AccelConfigureActivity extends AppCompatActivity implements SensorE
         }
     }
     private void checkSensorPermissionsAndStart() {
-        // For Android 12+, check HIGH_SAMPLING_RATE_SENSORS
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.HIGH_SAMPLING_RATE_SENSORS)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.HIGH_SAMPLING_RATE_SENSORS}, 999);
-                return; // Don't start sensors yet
-            }
-        }
-
-        // Try to access sensors - this will trigger GrapheneOS permission if needed
+        // Haven only samples the accelerometer at normal rates, so HIGH_SAMPLING_RATE_SENSORS
+        // (Android 12+) is not needed. On hardened ROMs (GrapheneOS) simply touching the
+        // sensor triggers the OS prompt if one is required.
         initWave();
         startAccel();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == 999) {
-            // Permission result received, now start sensors
-            initWave();
-            startAccel();
-        }
     }
 
     @Override

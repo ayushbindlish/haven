@@ -59,7 +59,7 @@ import org.havenapp.main.database.async.EventInsertAsync;
 import org.havenapp.main.model.Event;
 import org.havenapp.main.resources.IResourceManager;
 import org.havenapp.main.resources.ResourceManager;
-import org.havenapp.main.service.RemoveDeletedFilesJob;
+import org.havenapp.main.service.RemoveDeletedFilesWorker;
 import org.havenapp.main.service.SignalSender;
 import org.havenapp.main.ui.EventActivity;
 import org.havenapp.main.ui.EventAdapter;
@@ -205,7 +205,7 @@ public class ListActivity extends AppCompatActivity {
 
         fetchEventList();
 
-        RemoveDeletedFilesJob.Companion.schedule();
+        // Recurring storage cleanup is scheduled in HavenApp.onCreate() via WorkManager.
     }
 
     private void initializeRecyclerViewComponents() {
@@ -332,6 +332,9 @@ public class ListActivity extends AppCompatActivity {
             case R.id.action_run_cleanup_job:
                 runCleanUpJob();
                 break;
+            case R.id.action_device_setup:
+                DeviceSetupHelper.INSTANCE.showChecklist(this);
+                break;
         }
         return true;
     }
@@ -349,7 +352,7 @@ public class ListActivity extends AppCompatActivity {
     }
 
     private void runCleanUpJob() {
-        RemoveDeletedFilesJob.Companion.runNow();
+        RemoveDeletedFilesWorker.runNow(this);
     }
 
     private void onAllEventsRemoved(List<Event> removedEvents) {

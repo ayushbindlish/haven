@@ -75,6 +75,22 @@ public class Utils {
         return (int) (batteryPct * 100);
     }
 
+    /**
+     * @return true if the device is currently plugged in (AC, USB or wireless).
+     */
+    public static boolean isCharging(Context context) {
+        IntentFilter iFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = context.registerReceiver(null, iFilter);
+        if (batteryStatus == null) return false;
+        int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        if (status == BatteryManager.BATTERY_STATUS_CHARGING
+                || status == BatteryManager.BATTERY_STATUS_FULL) {
+            return true;
+        }
+        int plugged = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0);
+        return plugged != 0;
+    }
+
     public static void hideKeyboard(@NonNull Activity activity) {
         if (activity.getCurrentFocus() != null) {
             InputMethodManager inputMethodManager =

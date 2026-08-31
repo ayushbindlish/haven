@@ -94,6 +94,16 @@ public class PreferenceManager {
 
     public static final String DISABLE_BATTERY_OPT = "config_battery_optimizations";
 
+    /** Low-power sensing strategy. See {@link org.havenapp.main.sensors.SensingCoordinator}. */
+    public static final String POWER_MODE = "power_mode";
+    public static final String POWER_MODE_CONTINUOUS = "continuous";
+    public static final String POWER_MODE_ADAPTIVE = "adaptive";
+    public static final String POWER_MODE_BATTERY_SAVER = "battery_saver";
+
+    /** Independent on/off for the two "extra" ambient sensors (default on). */
+    public static final String AMBIENT_LIGHT_ACTIVE = "ambient_light_active";
+    public static final String BAROMETER_ACTIVE = "barometer_active";
+
     private static final String CURRENT_EVENT_START_TIME = "current_event_start_time";
 
     public static final String CONFIG_BASE_STORAGE = "config_base_storage";
@@ -348,6 +358,33 @@ public class PreferenceManager {
     	return appSharedPrefs.getInt(CAMERA_SENSITIVITY, LuminanceMotionDetector.MOTION_MEDIUM);
     }
     
+    public String getPowerMode() {
+        return appSharedPrefs.getString(POWER_MODE, POWER_MODE_ADAPTIVE);
+    }
+
+    public void setPowerMode(String mode) {
+        prefsEditor.putString(POWER_MODE, mode);
+        prefsEditor.commit();
+    }
+
+    public boolean getAmbientLightActive() {
+        return appSharedPrefs.getBoolean(AMBIENT_LIGHT_ACTIVE, true);
+    }
+
+    public void setAmbientLightActive(boolean active) {
+        prefsEditor.putBoolean(AMBIENT_LIGHT_ACTIVE, active);
+        prefsEditor.commit();
+    }
+
+    public boolean getBarometerActive() {
+        return appSharedPrefs.getBoolean(BAROMETER_ACTIVE, true);
+    }
+
+    public void setBarometerActive(boolean active) {
+        prefsEditor.putBoolean(BAROMETER_ACTIVE, active);
+        prefsEditor.commit();
+    }
+
     public void activateFlash(boolean active) {
     	prefsEditor.putBoolean(FLASH_ACTIVE, active);
     	prefsEditor.commit();

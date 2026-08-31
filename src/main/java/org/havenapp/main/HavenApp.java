@@ -23,14 +23,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.multidex.MultiDexApplication;
 
-import com.evernote.android.job.JobManager;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.decoder.SimpleProgressiveJpegConfig;
 import com.facebook.imagepipeline.nativecode.ImagePipelineNativeLoader;
 
 import org.havenapp.main.database.HavenEventDB;
-import org.havenapp.main.service.HavenJobCreator;
+import org.havenapp.main.service.RemoveDeletedFilesWorker;
 import org.havenapp.main.service.WebServer;
 
 import java.io.IOException;
@@ -82,7 +81,7 @@ public class HavenApp extends MultiDexApplication {
         havenApp = this;
         dataBaseInstance = HavenEventDB.getDatabase(this);
 
-        JobManager.create(this).addJobCreator(new HavenJobCreator());
+        RemoveDeletedFilesWorker.schedule(this);
     }
 
 

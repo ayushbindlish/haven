@@ -14,6 +14,7 @@
     <string name="sms_hint">+12125551212</string>
     <string name="camera_prompt">Select the camera</string>
     <string name="secure_service_started">Haven Activated</string>
+    <string name="secure_service_stopped">Couldn\'t start monitoring. Open Haven again and retry.</string>
     <string name="intrusion_detected">A Haven sensor was triggered (Type: %s)</string>
     <string name="title_activity_event">EventActivity</string>
     <string name="action_settings">Settings</string>
@@ -183,5 +184,16 @@
     <string name="configure_sensors_title">Configure Sensors</string>
     <string name="sensors_configured">Sensors configured successfully!</string>
 
+    <string name="power_mode_title">Power mode</string>
+    <string name="power_mode_summary">How aggressively Haven saves battery when nothing is happening</string>
+    <string name="power_mode_continuous">Continuous — all sensors always on (best plugged in)</string>
+    <string name="power_mode_adaptive">Adaptive — wake-triggered sensing (recommended)</string>
+    <string name="power_mode_battery_saver">Battery saver — minimal sensing until motion</string>
+
+    <string name="menu_device_setup">Device setup…</string>
+    <string name="device_setup_title">Keep Haven running</string>
+    <string name="device_setup_body">Samsung / One UI aggressively stops background apps. For reliable monitoring:\n\n1. Battery optimisation: exempt Haven (%1$s).\n2. Open App info → Battery → set to \"Unrestricted\".\n3. App info → disable \"Pause app activity if unused\".\n4. App info → Permissions → turn off \"Remove permissions if app is unused\".\n5. Settings → Battery → Background usage limits → make sure Haven is NOT in \"Sleeping\" or \"Deep sleeping apps\".\n6. Leave the phone plugged in for long deployments.</string>
+    <string name="device_setup_battery">Battery settings</string>
+    <string name="device_setup_appinfo">App info</string>
 
 </resources>

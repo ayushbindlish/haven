@@ -10,6 +10,10 @@
         <item name="android:textColorSecondary">@color/secondary_text</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <!-- targetSdk 35 forces edge-to-edge on Android 15+, which makes the toolbar and
+             overflow menu draw under/over the status bar. Opt out until Phase 5 adds
+             proper WindowInsets handling. (Honored while targetSdk < 36.) -->
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
 </style>
 
     <style name="SettingsTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
@@ -19,6 +23,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColorPrimary">@color/primary_text</item>
         <item name="android:textColorSecondary">@color/secondary_text</item>
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
     </style>
 
     <!-- Style for an Preference Entry -->

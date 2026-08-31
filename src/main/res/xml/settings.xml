@@ -24,6 +24,15 @@
         android:title="@string/disable_battery_opt_title"
         android:summary="@string/disable_battery_opt_summary"/>
 
+    <ListPreference
+        app:iconSpaceReserved="false"
+        android:entries="@array/power_mode_entries"
+        android:entryValues="@array/power_mode_values"
+        android:key="power_mode"
+        android:defaultValue="adaptive"
+        android:summary="%s"
+        android:title="@string/power_mode_title" />
+
     <PreferenceCategory
         app:iconSpaceReserved="false"
         android:title="@string/video_settings">

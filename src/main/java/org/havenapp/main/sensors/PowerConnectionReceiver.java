@@ -31,10 +31,13 @@ public class PowerConnectionReceiver extends BroadcastReceiver {
         // explicitly check the intent action
         // avoids lint issue UnsafeProtectedBroadcastReceiver
         if(intent.getAction() == null) return;
+        boolean charging;
         switch(intent.getAction()){
             case Intent.ACTION_POWER_CONNECTED:
+                charging = true;
                 break;
             case Intent.ACTION_POWER_DISCONNECTED:
+                charging = false;
                 break;
             default:
                 return;
@@ -42,6 +45,9 @@ public class PowerConnectionReceiver extends BroadcastReceiver {
 
         if (MonitorService.getInstance() != null
                 && MonitorService.getInstance().isRunning()) {
+            // let the sensing engine switch power tiers
+            MonitorService.getInstance().onPowerConnectivityChanged(charging);
+
             MonitorService.getInstance().alert(EventTrigger.POWER,
                     Utils.getBatteryPercentage(context) + "%" + " \n" +
                             context.getString(R.string.power_source_status) + " " +

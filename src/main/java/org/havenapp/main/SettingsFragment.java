@@ -226,7 +226,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         checkSignalUsername();
         checkSignalUsernameVerification();
         ((EditTextPreference) findPreference(PreferenceManager.VERIFY_SIGNAL)).setText("");
-        askForPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, 1);
+        // Kick off the runtime-permission chain: camera -> mic -> notifications.
+        askForPermission(Manifest.permission.CAMERA, 2);
 
     }
 
@@ -358,13 +359,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         switch (requestCode) {
-            case 1:
-                askForPermission(Manifest.permission.CAMERA, 2);
-                break;
             case 2:
                 askForPermission(Manifest.permission.RECORD_AUDIO, 3);
                 break;
-
+            case 3:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    askForPermission(Manifest.permission.POST_NOTIFICATIONS, 4);
+                }
+                break;
         }
 
     }

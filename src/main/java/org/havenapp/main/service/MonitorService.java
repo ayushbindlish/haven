@@ -38,6 +38,7 @@ import android.view.WindowManager;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.otaliastudios.cameraview.CameraView;
@@ -51,18 +52,15 @@ import org.havenapp.main.database.HavenEventDB;
 import org.havenapp.main.model.Event;
 import org.havenapp.main.model.EventTrigger;
 import org.havenapp.main.resources.ResourceManager;
-import org.havenapp.main.sensors.AccelerometerMonitor;
-import org.havenapp.main.sensors.AmbientLightMonitor;
-import org.havenapp.main.sensors.BarometerMonitor;
-import org.havenapp.main.sensors.BumpMonitor;
-import org.havenapp.main.sensors.MicrophoneMonitor;
 import org.havenapp.main.sensors.PowerConnectionReceiver;
+import org.havenapp.main.sensors.SensingCoordinator;
+import org.havenapp.main.sensors.SensorTriggerSink;
 import org.havenapp.main.ui.CameraViewHolder;
 
 import java.util.Date;
 
 @SuppressLint("HandlerLeak")
-public class MonitorService extends Service {
+public class MonitorService extends Service implements SensorTriggerSink {
 
     /**
      * Monitor instance
@@ -87,13 +85,9 @@ public class MonitorService extends Service {
      private PreferenceManager mPrefs = null;
 
     /**
-     * Sensor Monitors
+     * Owns every non-camera sensor monitor and the low-power tier state machine.
      */
-    private AccelerometerMonitor mAccelManager = null;
-    private BumpMonitor mBumpMonitor = null;
-    private MicrophoneMonitor mMicMonitor = null;
-    private BarometerMonitor mBaroMonitor = null;
-    private AmbientLightMonitor mLightMonitor = null;
+    private SensingCoordinator mCoordinator = null;
 
     private PowerConnectionReceiver mPowerReceiver = null;
 
@@ -126,14 +120,9 @@ public class MonitorService extends Service {
 	public final static String KEY_PATH = "path";
 		
 	/**
-	 * Messenger interface used by clients to interact
+	 * Messenger interface used by the camera pipeline (still Activity-driven until Phase 3).
 	 */
 	private final Messenger messenger = new Messenger(new MessageHandler());
-
-    /**
-     * Helps keep the service awake when screen is off
-     */
-    private PowerManager.WakeLock wakeLock;
 
     /**
      * Background Operations
@@ -160,7 +149,9 @@ public class MonitorService extends Service {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);
-        registerReceiver(screenStateReceiver, filter);
+        // Android 14 (API 34) requires an explicit exported flag on runtime-registered receivers.
+        ContextCompat.registerReceiver(this, screenStateReceiver, filter,
+                ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
     /**
@@ -187,11 +178,6 @@ public class MonitorService extends Service {
         startSensors();
 
         showNotification();
-
-        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK,
-                "haven:MyWakelockTag");
-        wakeLock.acquire();
     }
 
 
@@ -256,7 +242,6 @@ public class MonitorService extends Service {
         if (screenStateReceiver != null) {
             unregisterReceiver(screenStateReceiver);
         }
-        wakeLock.release();
         stopSensors();
         stopForeground(true);
     }
@@ -330,16 +315,8 @@ public class MonitorService extends Service {
         // set current event start date in prefs
         mPrefs.setCurrentSession(new Date(System.currentTimeMillis()));
 
-        if (!mPrefs.getAccelerometerSensitivity().equals(PreferenceManager.OFF)) {
-            mAccelManager = new AccelerometerMonitor(this);
-            if(Build.VERSION.SDK_INT>=18) {
-                mBumpMonitor = new BumpMonitor(this);
-            }
-        }
-
-        //moving these out of the accelerometer pref, but need to enable off prefs for them too
-        mBaroMonitor = new BarometerMonitor(this);
-        mLightMonitor = new AmbientLightMonitor(this);
+        mCoordinator = new SensingCoordinator(this, this);
+        mCoordinator.start();
 
         mPrefs.activateMonitorService(true);
 
@@ -348,41 +325,23 @@ public class MonitorService extends Service {
             sender.startHeartbeatTimer(mPrefs.getHeartbeatNotificationTimeMs());
         }
 
-        // && !mPrefs.getVideoMonitoringActive()
-
-        if (!mPrefs.getMicrophoneSensitivity().equals(PreferenceManager.OFF))
-            mMicMonitor = new MicrophoneMonitor(this);
-
         mPowerReceiver = new PowerConnectionReceiver();
-        // register our power status receivers
-        IntentFilter powerConnectedFilter = new IntentFilter(Intent.ACTION_POWER_CONNECTED);
-        registerReceiver(mPowerReceiver, powerConnectedFilter);
-
-        IntentFilter powerDisconnectedFilter = new IntentFilter(Intent.ACTION_POWER_DISCONNECTED);
-        registerReceiver(mPowerReceiver, powerDisconnectedFilter);
+        // register our power status receivers (single filter, both actions)
+        IntentFilter powerFilter = new IntentFilter();
+        powerFilter.addAction(Intent.ACTION_POWER_CONNECTED);
+        powerFilter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+        ContextCompat.registerReceiver(this, mPowerReceiver, powerFilter,
+                ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
     private void stopSensors ()
     {
         mIsMonitoringActive = false;
-        //this will never be false:
-        // -you can't use ==, != for string comparisons, use equals() instead
-        // -Value is never set to OFF in the first place
-        if (!mPrefs.getAccelerometerSensitivity().equals(PreferenceManager.OFF)) {
-            mAccelManager.stop(this);
-            if(Build.VERSION.SDK_INT>=18) {
-                mBumpMonitor.stop(this);
-            }
+
+        if (mCoordinator != null) {
+            mCoordinator.stop();
+            mCoordinator = null;
         }
-
-        //moving these out of the accelerometer pref, but need to enable off prefs for them too
-        mBaroMonitor.stop(this);
-        mLightMonitor.stop(this);
-
-        // && !mPrefs.getVideoMonitoringActive())
-
-        if (!mPrefs.getMicrophoneSensitivity().equals(PreferenceManager.OFF))
-            mMicMonitor.stop(this);
 
         if (mPrefs.getMonitorServiceActive()) {
             mPrefs.activateMonitorService(false);
@@ -391,8 +350,30 @@ public class MonitorService extends Service {
                 sender.stopHeartbeatTimer();
             }
         }
-        
-        unregisterReceiver(mPowerReceiver);
+
+        if (mPowerReceiver != null) {
+            try {
+                unregisterReceiver(mPowerReceiver);
+            } catch (IllegalArgumentException ignored) {
+                // was never registered
+            }
+            mPowerReceiver = null;
+        }
+    }
+
+    /** Sink for {@link SensingCoordinator}: route every sensor detection into {@link #alert}. */
+    @Override
+    public void onSensorTrigger(int eventTriggerType, String value) {
+        if (mIsMonitoringActive) {
+            alert(eventTriggerType, value);
+        }
+    }
+
+    /** Called by {@link PowerConnectionReceiver} when the charger is plugged / unplugged. */
+    public void onPowerConnectivityChanged(boolean charging) {
+        if (mCoordinator != null) {
+            mCoordinator.onPowerConnectivityChanged(charging);
+        }
     }
 
     /**

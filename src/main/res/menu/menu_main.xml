@@ -26,6 +26,12 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_device_setup"
+        android:title="@string/menu_device_setup"
+        android:orderInCategory="1"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/action_run_cleanup_job"
         android:title="@string/run_disk_cleanup"
         android:orderInCategory="2"

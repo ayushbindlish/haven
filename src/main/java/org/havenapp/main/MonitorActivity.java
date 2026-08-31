@@ -174,18 +174,8 @@ public class MonitorActivity extends AppCompatActivity implements TimePickerDial
             initActiveLayout();
         }
 
-        // Request permissions after UI is set up
-        askForPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, 1);
-    }
-
-    private void requestOverlayPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.canDrawOverlays(this)) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent, 1234); // Use any request code
-            }
-        }
+        // Request permissions after UI is set up: camera -> mic -> notifications.
+        askForPermission(Manifest.permission.CAMERA, 2);
     }
 
     private void initActiveLayout() {
@@ -433,10 +423,19 @@ public class MonitorActivity extends AppCompatActivity implements TimePickerDial
         btnBlankScreen.setVisibility(View.VISIBLE);
 
         Intent serviceIntent = new Intent(this, MonitorService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(serviceIntent);
-        } else {
-            startService(serviceIntent);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent);
+            } else {
+                startService(serviceIntent);
+            }
+        } catch (Exception e) {
+            // e.g. ForegroundServiceStartNotAllowedException (API 31+) if the OS decides
+            // the app is not sufficiently in the foreground. Surface it rather than crash.
+            mIsMonitoring = false;
+            Log.e("Monitor", "unable to start MonitorService", e);
+            Toast.makeText(this, R.string.secure_service_stopped, Toast.LENGTH_LONG).show();
+            return;
         }
 
         try {
@@ -661,11 +660,16 @@ public class MonitorActivity extends AppCompatActivity implements TimePickerDial
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         switch (requestCode) {
-            case 1:
-                askForPermission(Manifest.permission.CAMERA, 2);
-                break;
             case 2:
-                // Permissions done - UI is already initialized
+                askForPermission(Manifest.permission.RECORD_AUDIO, 3);
+                break;
+            case 3:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    askForPermission(Manifest.permission.POST_NOTIFICATIONS, 4);
+                }
+                break;
+            case 4:
+                // Permission chain complete.
                 break;
         }
     }

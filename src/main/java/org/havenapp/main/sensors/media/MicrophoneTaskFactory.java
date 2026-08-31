@@ -38,9 +38,13 @@ public class MicrophoneTaskFactory {
 		return recorderTask;
 	}
 	
-	public static MicSamplerTask makeSampler(Context context) throws RecordLimitExceeded {
-		if ((recorderTask != null && recorderTask.isRecording()) || (samplerTask != null && !samplerTask.isCancelled())) 
+	public static synchronized MicSamplerTask makeSampler(Context context) throws RecordLimitExceeded {
+		if (recorderTask != null && recorderTask.isRecording())
 			throw new RecordLimitExceeded();
+		// A lingering sampler from a previous power tier: cancel it, newest request wins.
+		if (samplerTask != null && !samplerTask.isCancelled()) {
+			samplerTask.cancel(true);
+		}
 		samplerTask = new MicSamplerTask();
 		return samplerTask;
 	}

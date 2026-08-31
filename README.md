@@ -51,6 +51,31 @@ The following sensors are monitored for a measurable change, and then recorded t
 
 The application can be built using Android Studio and Gradle. It relies on a number of third-party dependencies, all of which are free, open-source, and listed at the end of this document.
 
+From the command line: `./gradlew assembleDebug` produces `build/outputs/apk/debug/Haven-*-debug.apk`. Requires JDK 17 and an Android SDK with platform 34+ (`local.properties` must contain `sdk.dir=...`).
+
+## Deploying as a guard device (Samsung / One UI)
+
+Samsung's One UI stops background apps aggressively, which will kill monitoring even
+though Haven runs as a foreground service. On each device, after installing:
+
+1. Open Haven → overflow menu → **Device setup…** and follow the checklist, or set these
+   manually:
+2. **Settings → Apps → Haven → Battery → Unrestricted.**
+3. **Settings → Apps → Haven → Pause app activity if unused → OFF.**
+4. **Settings → Apps → Haven → Permissions → Remove permissions if app is unused → OFF.**
+5. **Settings → Battery → Background usage limits** → ensure Haven is **not** listed under
+   *Sleeping apps* or *Deep sleeping apps*.
+6. Grant the battery-optimisation exemption when prompted (Haven asks on first arm).
+7. For long unattended deployments, keep the phone **plugged in**.
+
+Device notes:
+
+| Device | Android / One UI | Notes |
+|---|---|---|
+| Galaxy S25 Ultra | 15/16, One UI 7+ | Full sensor set incl. barometer; best cameras. Good for battery-powered deployments with the adaptive power mode (Phase 2+). |
+| Galaxy S23 Ultra | 13→15, One UI 5→7 | Full sensor set incl. barometer. Same as above. |
+| Galaxy M31s | 10→12, One UI 2→4.1 | **No barometer** (pressure trigger auto-disabled). Ideal always-plugged-in guard unit running the *Continuous* power mode. |
+
 ## Install
 
 You can currently get the Haven BETA release in one of three ways:

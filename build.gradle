@@ -39,9 +39,9 @@ allprojects {
     project.ext {
         version_number = getVersionName()
         group_info = "haven"
-        buildToolsVersion = "30.0.2"
+        buildToolsVersion = "34.0.0"
         minSdkVersion = 24
-        targetSdkVersion = 34
+        targetSdkVersion = 35
     }
 }
 
@@ -51,7 +51,7 @@ android {
         options.compilerArgs += ["-Xlint:unchecked"]
     }
 
-    compileSdkVersion 34
+    compileSdkVersion 35
 
     buildFeatures {
         viewBinding true
@@ -75,14 +75,15 @@ android {
         versionName getVersionName()
         archivesBaseName = "Haven-$versionName"
         minSdkVersion 24
-        targetSdkVersion 34
-        ndkVersion '25.0.8775105'
+        targetSdkVersion 35
+        ndkVersion '28.2.13676358'
 
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
 
         ndk {
-            abiFilters "armeabi", "armeabi-v7a", "x86", 'arm64-v8a'
+            // "armeabi" was removed from the NDK long ago; "x86" is emulator-only 32-bit.
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
         }
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -175,7 +176,6 @@ dependencies {
 
     implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
-    implementation 'com.github.shenguojun:renderscript-intrinsics-replacement-toolkit:main-SNAPSHOT'
 
     // Match Kotlin version
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -198,8 +198,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.7.0'
     androidTestImplementation 'androidx.room:room-testing:2.7.2'
 
-    // android-job
-    implementation 'com.evernote:android-job:1.4.3'
+    // Periodic background work (storage cleanup). Replaces the unmaintained
+    // com.evernote:android-job. work-runtime is already forced to 2.8.1 above.
 
     // new camera view: https://github.com/natario1/CameraView
     implementation 'com.otaliastudios:cameraview:2.7.2'
