@@ -158,6 +158,12 @@
             android:key="pin_to_stop"
             android:title="@string/pin_to_stop" />
 
+        <Preference
+            app:iconSpaceReserved="false"
+            android:key="admin_protect"
+            android:title="@string/admin_title"
+            android:summary="@string/admin_summary_off" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

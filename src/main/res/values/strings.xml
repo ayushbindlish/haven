@@ -203,6 +203,12 @@
     <string name="pin_cleared">PIN cleared</string>
     <string name="pin_lock_on_launch">Require PIN to open Haven</string>
     <string name="pin_to_stop">Require PIN to stop monitoring</string>
+    <string name="admin_title">Uninstall protection</string>
+    <string name="admin_summary_off">Off — tap to make Haven a device admin so it can\'t be removed without deactivating it first</string>
+    <string name="admin_summary_on">On — deactivating device admin is required before uninstall, and triggers an alert</string>
+    <string name="admin_explanation">Lets Haven resist casual removal: the device admin must be turned off before the app can be uninstalled, and Haven alerts you when that happens.</string>
+    <string name="admin_disable_warning">Turning this off removes Haven\'s tamper protection. An alert will be sent.</string>
+    <string name="admin_disabled_alert">Haven device-admin was removed — possible tampering</string>
     <string name="resume_monitoring_title">Haven monitoring was interrupted</string>
     <string name="resume_monitoring_text">Tap to resume protecting this device</string>
 

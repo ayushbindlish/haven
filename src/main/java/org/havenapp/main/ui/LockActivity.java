@@ -78,7 +78,11 @@ public class LockActivity extends AppCompatActivity {
                 unlock();
             } else {
                 input.setText("");
-                error.setText(getString(R.string.pin_wrong, pin.failedCount()));
+                int fails = pin.failedCount();
+                error.setText(getString(R.string.pin_wrong, fails));
+                if (fails >= 5) {
+                    new org.havenapp.main.security.AdminManager(this).lockNow();
+                }
             }
         });
 

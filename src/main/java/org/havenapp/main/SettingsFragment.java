@@ -162,6 +162,20 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return true;
         });
 
+        Preference adminPref = findPreference("admin_protect");
+        refreshAdminSummary(adminPref);
+        adminPref.setOnPreferenceClickListener(p -> {
+            org.havenapp.main.security.AdminManager am =
+                    new org.havenapp.main.security.AdminManager(mActivity);
+            if (am.isActive()) {
+                am.deactivate();
+                refreshAdminSummary(p);
+            } else {
+                startActivity(am.activationIntent());
+            }
+            return true;
+        });
+
         // Kick off the runtime-permission chain: camera -> mic -> notifications.
         askForPermission(Manifest.permission.CAMERA, 2);
     }
@@ -235,13 +249,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 }
                 break;
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        getPreferenceScreen().getSharedPreferences()
-                .registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -403,6 +410,20 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         } else if (view.getTag().equalsIgnoreCase("VideoLengthPickerDialog")) {
             preferences.setMonitoringTime(seconds);
         }
+    }
+
+    private void refreshAdminSummary(Preference p) {
+        if (p == null) return;
+        boolean active = new org.havenapp.main.security.AdminManager(mActivity).isActive();
+        p.setSummary(active ? R.string.admin_summary_on : R.string.admin_summary_off);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getPreferenceScreen().getSharedPreferences()
+                .registerOnSharedPreferenceChangeListener(this);
+        refreshAdminSummary(findPreference("admin_protect"));
     }
 
     private void showPinDialog() {
