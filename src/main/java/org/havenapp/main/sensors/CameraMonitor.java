@@ -26,6 +26,7 @@ import androidx.camera.video.VideoRecordEvent;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
+import org.havenapp.main.PowerPolicy;
 import org.havenapp.main.PreferenceManager;
 import org.havenapp.main.Utils;
 import org.havenapp.main.model.EventTrigger;
@@ -71,6 +72,9 @@ public class CameraMonitor {
     private final LuminanceMotionDetector detector = new LuminanceMotionDetector();
     private int[] lastLuma;
     private long lastCaptureAt;
+    private long lastAnalyzedAt;
+    private volatile long minFrameIntervalMs = 200; // updated from PowerPolicy
+    private volatile boolean allowVideo = true;
     private boolean started;
     private boolean analyzerLogged;
 
@@ -87,10 +91,19 @@ public class CameraMonitor {
         return prefs.getCameraActivation() && lensSelector() != null;
     }
 
+    /** Re-read PowerPolicy knobs (fps throttle, video gate). Safe to call any time. */
+    public void applyPowerPolicy() {
+        PowerPolicy.Tier tier = PowerPolicy.current(context);
+        int fps = Math.max(1, PowerPolicy.cameraAnalysisFps(tier));
+        minFrameIntervalMs = 1000L / fps;
+        allowVideo = PowerPolicy.allowVideoCapture(tier);
+    }
+
     /** Must be called on the main thread. */
     public void start() {
         if (started || !isEnabled()) return;
         started = true;
+        applyPowerPolicy();
         detector.setThreshold(prefs.getCameraSensitivity());
 
         com.google.common.util.concurrent.ListenableFuture<ProcessCameraProvider> future =
@@ -151,7 +164,7 @@ public class CameraMonitor {
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .build();
 
-        boolean video = prefs.getVideoMonitoringActive();
+        boolean video = prefs.getVideoMonitoringActive() && allowVideo;
         try {
             cameraProvider.unbindAll();
             if (video) {
@@ -175,6 +188,12 @@ public class CameraMonitor {
     private void analyze(@NonNull ImageProxy image) {
         try {
             if (image.getFormat() != ImageFormat.YUV_420_888) return;
+
+            // fps throttle: CameraX delivers ~30fps; only process every minFrameIntervalMs.
+            long now = SystemClock.elapsedRealtime();
+            if (now - lastAnalyzedAt < minFrameIntervalMs) return;
+            lastAnalyzedAt = now;
+
             int w = image.getWidth();
             int h = image.getHeight();
             int[] luma = extractLuma(image, w, h);

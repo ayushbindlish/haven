@@ -345,8 +345,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                         startActivity(ur.settingsIntent());
                     } catch (Exception ignored) {
                     }
+                } else if (sw != null && sw.isChecked()) {
+                    // instant first report; the coalesced HousekeepingWorker sends it daily after
+                    org.havenapp.main.service.UsageReportWorker.runNow(mActivity);
                 }
-                org.havenapp.main.service.UsageReportWorker.reschedule(mActivity);
                 break;
             }
         }

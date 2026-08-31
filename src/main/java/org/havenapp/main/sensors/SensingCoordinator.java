@@ -56,6 +56,8 @@ public class SensingCoordinator implements SensorTriggerSink {
     private CameraMonitor cam;
 
     private final Runnable lingerDown = this::enterIdle;
+    private final PowerManager powerManager;
+    private PowerManager.OnThermalStatusChangedListener thermalListener;
 
     public SensingCoordinator(Context context, SensorTriggerSink outSink, LifecycleOwner lifecycleOwner) {
         this.context = context.getApplicationContext();
@@ -63,9 +65,31 @@ public class SensingCoordinator implements SensorTriggerSink {
         this.lifecycleOwner = lifecycleOwner;
         this.prefs = new PreferenceManager(this.context);
 
-        PowerManager pm = (PowerManager) this.context.getSystemService(Context.POWER_SERVICE);
-        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "haven:SensingCoordinator");
+        powerManager = (PowerManager) this.context.getSystemService(Context.POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "haven:SensingCoordinator");
         wakeLock.setReferenceCounted(false);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            thermalListener = status -> handler.post(this::onPowerConditionsChanged);
+            try {
+                powerManager.addThermalStatusListener(thermalListener);
+            } catch (Exception ignored) {
+                thermalListener = null;
+            }
+        }
+    }
+
+    /** Re-apply power knobs to the live camera when charge / thermal state moves. */
+    public synchronized void onPowerConditionsChanged() {
+        if (cam != null) cam.applyPowerPolicy();
+        // effective power mode may have flipped (e.g. thermal SEVERE -> SAVER)
+        String want = resolveMode();
+        if (!want.equals(effectiveMode) && tier != Tier.OFF) {
+            Log.i(TAG, "power conditions -> mode " + effectiveMode + " => " + want);
+            teardownAll();
+            handler.removeCallbacks(lingerDown);
+            apply();
+        }
     }
 
     /* ------------------------------------------------------------------ lifecycle */
@@ -77,6 +101,13 @@ public class SensingCoordinator implements SensorTriggerSink {
 
     public synchronized void stop() {
         handler.removeCallbacks(lingerDown);
+        if (thermalListener != null) {
+            try {
+                powerManager.removeThermalStatusListener(thermalListener);
+            } catch (Exception ignored) {
+            }
+            thermalListener = null;
+        }
         teardownAll();
         releaseWakeLock();
         tier = Tier.OFF;
@@ -87,6 +118,7 @@ public class SensingCoordinator implements SensorTriggerSink {
         if (tier == Tier.OFF) return;
         if (nowCharging == this.charging) return;
         this.charging = nowCharging;
+        if (cam != null) cam.applyPowerPolicy();
         String want = resolveMode();
         if (!want.equals(effectiveMode)) {
             Log.i(TAG, "power change -> mode " + effectiveMode + " => " + want);
@@ -109,6 +141,10 @@ public class SensingCoordinator implements SensorTriggerSink {
     }
 
     private String resolveMode() {
+        // Overheating always wins: throttle regardless of charge state.
+        if (org.havenapp.main.PowerPolicy.thermalStatus(context) >= 3 /* SEVERE */) {
+            return PreferenceManager.POWER_MODE_BATTERY_SAVER;
+        }
         if (charging) return PreferenceManager.POWER_MODE_CONTINUOUS;
         int pct = Utils.getBatteryPercentage(context);
         if (pct > 0 && pct <= LOW_BATTERY_PCT) return PreferenceManager.POWER_MODE_BATTERY_SAVER;

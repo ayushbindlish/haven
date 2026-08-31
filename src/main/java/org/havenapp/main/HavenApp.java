@@ -29,9 +29,8 @@ import com.facebook.imagepipeline.decoder.SimpleProgressiveJpegConfig;
 import com.facebook.imagepipeline.nativecode.ImagePipelineNativeLoader;
 
 import org.havenapp.main.database.HavenEventDB;
-import org.havenapp.main.service.IntegrityAuditWorker;
+import org.havenapp.main.service.HousekeepingWorker;
 import org.havenapp.main.service.RemoveDeletedFilesWorker;
-import org.havenapp.main.service.UsageReportWorker;
 import org.havenapp.main.service.WebServer;
 
 import java.io.IOException;
@@ -84,8 +83,7 @@ public class HavenApp extends MultiDexApplication {
         dataBaseInstance = HavenEventDB.getDatabase(this);
 
         RemoveDeletedFilesWorker.schedule(this);
-        IntegrityAuditWorker.schedule(this);
-        UsageReportWorker.reschedule(this);
+        HousekeepingWorker.bootstrap(this); // coalesced audit + usage digest, power-adaptive cadence
     }
 
 
