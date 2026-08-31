@@ -281,6 +281,8 @@
     <string name="mesh_summary">Devices sharing this ntfy topic check on each other; alert if one goes quiet</string>
     <string name="mesh_name_title">This device\'s name in the mesh</string>
     <string name="mesh_name_summary">Defaults to the phone model</string>
+    <string name="tile_armed">Haven: armed</string>
+    <string name="tile_disarmed">Haven: off</string>
 
     <string name="power_mode_title">Power mode</string>
     <string name="power_mode_summary">How aggressively Haven saves battery when nothing is happening</string>

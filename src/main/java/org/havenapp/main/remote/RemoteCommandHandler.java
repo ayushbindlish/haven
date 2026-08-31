@@ -59,17 +59,18 @@ public final class RemoteCommandHandler {
                 return true;
             }
             case "ARM": {
-                new org.havenapp.main.service.BootReceiver()
-                        .onReceive(app, new Intent(Intent.ACTION_MY_PACKAGE_REPLACED));
+                org.havenapp.main.service.ResumeNotifier.post(app, "Remote ARM — tap to arm Haven");
                 reply.send("Tap the Haven notification on the device to arm.");
                 return true;
             }
             case "SNOOZE": {
                 int min = 30;
                 try { min = Math.max(1, Integer.parseInt(arg)); } catch (Exception ignored) {}
-                prefs.setSnoozeUntil(System.currentTimeMillis() + min * 60_000L);
+                long until = System.currentTimeMillis() + min * 60_000L;
+                prefs.setSnoozeUntil(until);
                 app.stopService(new Intent(app, MonitorService.class));
-                reply.send("Snoozed " + min + " min.");
+                org.havenapp.main.service.SnoozeReceiver.schedule(app, until);
+                reply.send("Snoozed " + min + " min; you'll be prompted to re-arm.");
                 return true;
             }
             case "PHOTO": {

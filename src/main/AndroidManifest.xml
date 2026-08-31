@@ -125,6 +125,28 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name=".tile.HavenTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_stat_haven"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".tile.HavenWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/haven_widget_info" />
+        </receiver>
+
         <receiver
             android:name=".service.BootReceiver"
             android:exported="true"
