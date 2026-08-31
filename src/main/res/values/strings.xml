@@ -209,6 +209,19 @@
     <string name="admin_explanation">Lets Haven resist casual removal: the device admin must be turned off before the app can be uninstalled, and Haven alerts you when that happens.</string>
     <string name="admin_disable_warning">Turning this off removes Haven\'s tamper protection. An alert will be sent.</string>
     <string name="admin_disabled_alert">Haven device-admin was removed — possible tampering</string>
+    <string name="alert_app_changes_title">Alert on app install / removal</string>
+    <string name="alert_app_changes_summary">Send an alert whenever an app is added or removed</string>
+    <string name="usage_report_title">Daily screen-time report</string>
+    <string name="usage_report_summary">Send a daily digest of app usage (requires \"Usage access\")</string>
+    <string name="usage_access_needed">Grant \"Usage access\" to Haven, then turn this on again</string>
+    <string name="security_audit_title">Compromise self-audit</string>
+    <string name="security_audit_summary">Every 6h, check for new accessibility services, device admins, apps, root, developer settings and alert on changes</string>
+    <string name="boot_resume_title">Resume monitoring after reboot</string>
+    <string name="boot_resume_summary">After a restart or update, show a notification to re-arm Haven</string>
+    <string name="sensor_light_title">Ambient light sensor</string>
+    <string name="sensor_light_summary">Trigger on sudden light changes (door opening, lights on)</string>
+    <string name="sensor_baro_title">Barometer</string>
+    <string name="sensor_baro_summary">Trigger on air-pressure spikes (door open/close); ignored if the device has no barometer</string>
     <string name="resume_monitoring_title">Haven monitoring was interrupted</string>
     <string name="resume_monitoring_text">Tap to resume protecting this device</string>
 

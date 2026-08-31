@@ -40,6 +40,7 @@ public class BootReceiver extends BroadcastReceiver {
         }
 
         PreferenceManager prefs = new PreferenceManager(context);
+        if (!prefs.getBootResumeEnabled()) return;
         if (!prefs.getMonitorServiceActive()) return;
         if (MonitorService.getInstance() != null && MonitorService.getInstance().isRunning()) return;
 

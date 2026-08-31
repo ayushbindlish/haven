@@ -323,6 +323,32 @@ public class PreferenceManager {
     	return appSharedPrefs.getInt(CAMERA_SENSITIVITY, LuminanceMotionDetector.MOTION_MEDIUM);
     }
     
+    public boolean getAlertAppChanges() {
+        return appSharedPrefs.getBoolean("alert_app_changes", true);
+    }
+
+    public void setAlertAppChanges(boolean v) {
+        prefsEditor.putBoolean("alert_app_changes", v);
+        prefsEditor.commit();
+    }
+
+    public boolean getUsageReportEnabled() {
+        return appSharedPrefs.getBoolean("usage_report_enabled", false);
+    }
+
+    public void setUsageReportEnabled(boolean v) {
+        prefsEditor.putBoolean("usage_report_enabled", v);
+        prefsEditor.commit();
+    }
+
+    public boolean getSecurityAuditEnabled() {
+        return appSharedPrefs.getBoolean("security_audit_enabled", true);
+    }
+
+    public boolean getBootResumeEnabled() {
+        return appSharedPrefs.getBoolean("boot_resume_enabled", true);
+    }
+
     public String getPowerMode() {
         return appSharedPrefs.getString(POWER_MODE, POWER_MODE_ADAPTIVE);
     }

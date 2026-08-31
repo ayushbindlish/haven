@@ -8,6 +8,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import org.havenapp.main.PreferenceManager
 import org.havenapp.main.alerts.AlertManager
 import org.havenapp.main.security.IntegrityAuditor
 import java.util.concurrent.TimeUnit
@@ -42,6 +43,7 @@ class IntegrityAuditWorker(
     }
 
     override fun doWork(): Result {
+        if (!PreferenceManager(applicationContext).securityAuditEnabled) return Result.success()
         return try {
             val changes = IntegrityAuditor(applicationContext).auditAgainstBaseline()
             if (changes.isNotEmpty()) {

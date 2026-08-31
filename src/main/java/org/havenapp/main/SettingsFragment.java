@@ -333,6 +333,22 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             case PreferenceManager.CONFIG_BASE_STORAGE:
                 setDefaultStoragePath();
                 break;
+            case "usage_report_enabled": {
+                SwitchPreference sw = findPreference("usage_report_enabled");
+                org.havenapp.main.security.UsageReporter ur =
+                        new org.havenapp.main.security.UsageReporter(mActivity);
+                if (sw != null && sw.isChecked() && !ur.hasPermission()) {
+                    android.widget.Toast.makeText(mActivity, R.string.usage_access_needed,
+                            android.widget.Toast.LENGTH_LONG).show();
+                    sw.setChecked(false);
+                    try {
+                        startActivity(ur.settingsIntent());
+                    } catch (Exception ignored) {
+                    }
+                }
+                org.havenapp.main.service.UsageReportWorker.reschedule(mActivity);
+                break;
+            }
         }
     }
 

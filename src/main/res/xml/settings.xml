@@ -75,6 +75,20 @@
             android:key="config_movement"
             android:title="@string/accelerometer_prompt" />
 
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="true"
+            android:key="ambient_light_active"
+            android:title="@string/sensor_light_title"
+            android:summary="@string/sensor_light_summary" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="true"
+            android:key="barometer_active"
+            android:title="@string/sensor_baro_title"
+            android:summary="@string/sensor_baro_summary" />
+
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -163,6 +177,34 @@
             android:key="admin_protect"
             android:title="@string/admin_title"
             android:summary="@string/admin_summary_off" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="true"
+            android:key="alert_app_changes"
+            android:title="@string/alert_app_changes_title"
+            android:summary="@string/alert_app_changes_summary" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="usage_report_enabled"
+            android:title="@string/usage_report_title"
+            android:summary="@string/usage_report_summary" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="true"
+            android:key="security_audit_enabled"
+            android:title="@string/security_audit_title"
+            android:summary="@string/security_audit_summary" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="true"
+            android:key="boot_resume_enabled"
+            android:title="@string/boot_resume_title"
+            android:summary="@string/boot_resume_summary" />
 
     </PreferenceCategory>
 
