@@ -21,8 +21,10 @@ public class NtfyAlertChannel implements AlertChannel {
     private static final String TAG = "NtfyAlertChannel";
 
     private final PreferenceManager prefs;
+    private final Context context;
 
     public NtfyAlertChannel(Context context) {
+        this.context = context.getApplicationContext();
         this.prefs = new PreferenceManager(context);
     }
 
@@ -45,6 +47,10 @@ public class NtfyAlertChannel implements AlertChannel {
         String base = prefs.getNtfyServer().replaceAll("/+$", "");
         String url = base + "/" + prefs.getNtfyTopic();
         boolean tor = prefs.getAlertsViaTor();
+
+        if (!TextUtils.isEmpty(mediaPath)) {
+            mediaPath = org.havenapp.main.security.MediaAccess.resolveForViewing(context, mediaPath);
+        }
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Title", "Haven");

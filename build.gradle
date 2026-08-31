@@ -150,6 +150,11 @@ dependencies {
     implementation "androidx.camera:camera-view:$camerax_version"
     implementation 'androidx.lifecycle:lifecycle-service:2.9.2'
     implementation 'androidx.biometric:biometric:1.1.0'
+    // At-rest encryption: Keystore-backed AEAD for media + backups
+    implementation 'com.google.crypto.tink:tink-android:1.13.0'
+    // Encrypted event database
+    implementation 'net.zetetic:sqlcipher-android:4.6.1'
+    implementation 'androidx.sqlite:sqlite:2.4.0'
     implementation 'com.google.android.gms:play-services-location:21.3.0'
     // On-device person detection; model delivered via Play Services so the APK stays
     // small. ML Kit auto-selects NNAPI / GPU where available.

@@ -202,7 +202,7 @@ public class EventActivity extends AppCompatActivity implements EventTriggerAdap
             if (trigger.getMimeType() == null || trigger.getPath() == null)
                 continue;
 
-            File fileIn = new File(trigger.getPath());
+            File fileIn = new File(viewable(trigger.getPath()));
             Uri u = Uri.fromFile(fileIn);
             uris.add(u);
         }
@@ -231,10 +231,15 @@ public class EventActivity extends AppCompatActivity implements EventTriggerAdap
         return mEventLog.toString();
     }
 
+    /** Real filesystem path for viewing (decrypts an at-rest-encrypted file into the cache). */
+    private String viewable(String path) {
+        return org.havenapp.main.security.MediaAccess.resolveForViewing(this, path);
+    }
+
     @Override
     public void onVideoClick(@NotNull EventTrigger eventTrigger) {
         Intent intent = new Intent(this, VideoPlayerActivity.class);
-        intent.setData(Uri.fromFile(new File(eventTrigger.getPath())));
+        intent.setData(Uri.fromFile(new File(viewable(eventTrigger.getPath()))));
         startActivity(intent);
     }
 
@@ -269,7 +274,7 @@ public class EventActivity extends AppCompatActivity implements EventTriggerAdap
     private void shareMedia (EventTrigger eventTrigger) {
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(eventTrigger.getPath())));
+        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(viewable(eventTrigger.getPath()))));
         shareIntent.setType(eventTrigger.getMimeType());
         startActivity(shareIntent);
     }
@@ -281,7 +286,7 @@ public class EventActivity extends AppCompatActivity implements EventTriggerAdap
             if (trigger.getType() == EventTrigger.CAMERA
                     && (!TextUtils.isEmpty(trigger.getPath())))
             {
-               eventTriggerImagePaths.add(Uri.fromFile(new File(trigger.getPath())));
+               eventTriggerImagePaths.add(Uri.fromFile(new File(viewable(trigger.getPath()))));
             }
         }
     }

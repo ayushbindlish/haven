@@ -32,9 +32,8 @@ public final class EvidenceLog {
             File f = file(context);
             String prevChain = lastChain(f);
             String fileHash = "";
-            if (path != null) {
-                File media = new File(path);
-                if (media.isFile()) fileHash = sha256File(media);
+            if (path != null && new File(path).isFile()) {
+                fileHash = sha256Plain(context, path);
             }
             String core = System.currentTimeMillis() + "|" + type + "|"
                     + (path == null ? "" : path) + "|" + fileHash;
@@ -73,7 +72,7 @@ public final class EvidenceLog {
                     File media = new File(parts[2]);
                     if (!media.exists()) {
                         problems.add("Line " + n + ": media missing (" + media.getName() + ")");
-                    } else if (!sha256File(media).equals(parts[3])) {
+                    } else if (!sha256Plain(context, parts[2]).equals(parts[3])) {
                         problems.add("Line " + n + ": media altered (" + media.getName() + ")");
                     }
                 }
@@ -101,8 +100,9 @@ public final class EvidenceLog {
         return hex(MessageDigest.getInstance("SHA-256").digest(s.getBytes("UTF-8")));
     }
 
-    private static String sha256File(File f) {
-        try (InputStream in = new java.io.FileInputStream(f)) {
+    /** SHA-256 of the plaintext content, whether the file on disk is encrypted or not. */
+    private static String sha256Plain(Context context, String path) {
+        try (InputStream in = MediaAccess.openPlain(context, path)) {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] buf = new byte[8192];
             int n;

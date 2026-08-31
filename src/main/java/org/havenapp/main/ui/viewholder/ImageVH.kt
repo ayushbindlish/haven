@@ -36,8 +36,9 @@ class ImageVH(private val resourceManager: IResourceManager,
         holder.image.setImageURI(fileUri);
          **/
 
-        val fileUri = Uri.parse("file://" + eventTrigger.path!!)
-        imageView.setImageURI(fileUri)
+        val viewPath = org.havenapp.main.security.MediaAccess
+            .resolveForViewing(itemView.context, eventTrigger.path!!)
+        imageView.setImageURI(Uri.parse("file://$viewPath"))
 
 
         imageView.setOnClickListener {

@@ -23,8 +23,10 @@ public class TelegramAlertChannel implements AlertChannel {
     private static final String API = "https://api.telegram.org/bot";
 
     private final PreferenceManager prefs;
+    private final Context context;
 
     public TelegramAlertChannel(Context context) {
+        this.context = context.getApplicationContext();
         this.prefs = new PreferenceManager(context);
     }
 
@@ -47,6 +49,9 @@ public class TelegramAlertChannel implements AlertChannel {
         String chatId = prefs.getTelegramChatId();
         boolean tor = prefs.getAlertsViaTor();
 
+        if (!TextUtils.isEmpty(mediaPath)) {
+            mediaPath = org.havenapp.main.security.MediaAccess.resolveForViewing(context, mediaPath);
+        }
         File media = TextUtils.isEmpty(mediaPath) ? null : new File(mediaPath);
         if (media != null && media.exists()) {
             String name = media.getName().toLowerCase(Locale.US);

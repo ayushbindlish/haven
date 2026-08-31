@@ -35,7 +35,8 @@ class AudioVH(private val resourceManager: IResourceManager, viewGroup: ViewGrou
 
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
-        val fileSound = File(eventTrigger.path)
+        val fileSound = File(org.havenapp.main.security.MediaAccess
+            .resolveForViewing(context, eventTrigger.path))
         try {
             val soundFile = SoundFile.create(fileSound.path, object : SoundFile.ProgressListener {
                 var lastProgress = 0

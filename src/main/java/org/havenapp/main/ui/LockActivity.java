@@ -128,6 +128,13 @@ public class LockActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        // Purge anything decrypted for viewing when the app leaves the foreground locked.
+        org.havenapp.main.security.MediaAccess.clearViewCache(this);
+    }
+
+    @Override
     public void onBackPressed() {
         // Can't back out of the lock; drop to the launcher instead.
         moveTaskToBack(true);

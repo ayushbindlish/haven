@@ -395,6 +395,15 @@ public class PreferenceManager {
         return appSharedPrefs.getBoolean("camera_preroll_enabled", true);
     }
 
+    public boolean getEncryptMedia() {
+        return appSharedPrefs.getBoolean("encrypt_media", false);
+    }
+
+    public void setEncryptMedia(boolean v) {
+        prefsEditor.putBoolean("encrypt_media", v);
+        prefsEditor.commit();
+    }
+
     public boolean getCameraPersonOnly() {
         return appSharedPrefs.getBoolean("camera_person_only", false);
     }

@@ -300,11 +300,14 @@ public class CameraMonitor {
             frames = preroll.toArray(new byte[0][]);
         }
         File dir = sessionDir();
+        boolean enc = org.havenapp.main.security.MediaAccess.encryptionEnabled(context);
         int i = 0;
         for (byte[] f : frames) {
-            File out = new File(dir, stamp + String.format(java.util.Locale.US, ".preroll-%02d.jpg", i++));
-            try (java.io.FileOutputStream fos = new java.io.FileOutputStream(out)) {
-                fos.write(f);
+            File out = new File(dir, stamp
+                    + String.format(java.util.Locale.US, ".preroll-%02d.jpg", i++)
+                    + (enc ? ".enc" : ""));
+            try {
+                org.havenapp.main.security.MediaAccess.write(context, f, out);
                 if (sink != null) sink.onSensorTrigger(EventTrigger.CAMERA, out.getAbsolutePath());
             } catch (Exception ignored) {
             }
@@ -333,8 +336,19 @@ public class CameraMonitor {
     private void captureStill() {
         if (imageCapture == null) return;
         String ts = new SimpleDateFormat(Utils.DATE_TIME_PATTERN, Locale.getDefault()).format(new Date());
-        File out = new File(sessionDir(), ts + ".detected.jpg");
-        ImageCapture.OutputFileOptions opts = new ImageCapture.OutputFileOptions.Builder(out).build();
+        boolean enc = org.havenapp.main.security.MediaAccess.encryptionEnabled(context);
+        final File out = new File(sessionDir(), ts + ".detected.jpg" + (enc ? ".enc" : ""));
+        ImageCapture.OutputFileOptions opts;
+        try {
+            opts = enc
+                    ? new ImageCapture.OutputFileOptions.Builder(
+                            org.havenapp.main.security.VaultCrypto.encryptingStream(context, out)).build()
+                    : new ImageCapture.OutputFileOptions.Builder(out).build();
+        } catch (Exception e) {
+            Log.e(TAG, "encrypting stream failed, capturing plain", e);
+            opts = new ImageCapture.OutputFileOptions.Builder(
+                    new File(sessionDir(), ts + ".detected.jpg")).build();
+        }
         imageCapture.takePicture(opts, ContextCompat.getMainExecutor(context),
                 new ImageCapture.OnImageSavedCallback() {
                     @Override
@@ -354,7 +368,9 @@ public class CameraMonitor {
     private void maybeRecordClip() {
         if (videoCapture == null || activeRecording != null) return;
         String ts = new SimpleDateFormat(Utils.DATE_TIME_PATTERN, Locale.getDefault()).format(new Date());
-        File out = new File(sessionDir(), ts + ".mp4");
+        final boolean enc = org.havenapp.main.security.MediaAccess.encryptionEnabled(context);
+        final File out = new File(sessionDir(), ts + ".mp4");                 // VideoCapture needs a real file
+        final File encOut = new File(sessionDir(), ts + ".mp4.enc");
         FileOutputOptions fileOpts = new FileOutputOptions.Builder(out).build();
         try {
             activeRecording = videoCapture.getOutput()
@@ -362,9 +378,20 @@ public class CameraMonitor {
                     .start(ContextCompat.getMainExecutor(context), event -> {
                         if (event instanceof VideoRecordEvent.Finalize) {
                             activeRecording = null;
-                            if (sink != null) {
-                                sink.onSensorTrigger(EventTrigger.CAMERA_VIDEO, out.getAbsolutePath());
+                            String path = out.getAbsolutePath();
+                            if (enc) {
+                                try {
+                                    byte[] bytes = org.havenapp.main.security.MediaAccess
+                                            .readAll(new java.io.FileInputStream(out));
+                                    org.havenapp.main.security.VaultCrypto.encryptFile(context, bytes, encOut);
+                                    //noinspection ResultOfMethodCallIgnored
+                                    out.delete();
+                                    path = encOut.getAbsolutePath();
+                                } catch (Exception ex) {
+                                    Log.e(TAG, "video encrypt failed, keeping plain", ex);
+                                }
                             }
+                            if (sink != null) sink.onSensorTrigger(EventTrigger.CAMERA_VIDEO, path);
                         }
                     });
             long clipMs = Math.max(3, prefs.getMonitoringTime()) * 1000L;

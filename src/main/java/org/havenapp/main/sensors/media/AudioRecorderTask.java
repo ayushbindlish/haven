@@ -136,11 +136,26 @@ public class AudioRecorderTask extends Thread {
 			recorder.release();
 
 			recording = false;
-        
+
     	    MicrophoneTaskFactory.restartSampling();
 
+			String outPath = audioPath.toString();
+			if (org.havenapp.main.security.MediaAccess.encryptionEnabled(context)) {
+				try {
+					java.io.File enc = new java.io.File(audioPath.getPath() + ".enc");
+					byte[] bytes = org.havenapp.main.security.MediaAccess.readAll(
+							new java.io.FileInputStream(audioPath));
+					org.havenapp.main.security.VaultCrypto.encryptFile(context, bytes, enc);
+					//noinspection ResultOfMethodCallIgnored
+					audioPath.delete();
+					outPath = enc.getAbsolutePath();
+				} catch (Exception ex) {
+					Log.w("AudioRecorderTask", "audio encrypt failed, keeping plain", ex);
+				}
+			}
+
 			if (mListener != null)
-				mListener.recordingComplete(audioPath.toString());
+				mListener.recordingComplete(outPath);
 		}
 		catch (IllegalStateException ise)
 		{

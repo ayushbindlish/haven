@@ -31,8 +31,10 @@ class VideoVH(private val clickListener: VideoClickListener, private val context
         title.text = eventTrigger.getStringType(resourceManager)
         desc.text = eventTrigger.time?.toLocaleString() ?: ""
 
+        val vpath = org.havenapp.main.security.MediaAccess
+            .resolveForViewing(context, eventTrigger.path.toString())
         val bitmapD = BitmapDrawable(context.resources,
-            ThumbnailUtils.createVideoThumbnail(eventTrigger.path.toString(),
+            ThumbnailUtils.createVideoThumbnail(vpath,
                 MediaStore.Video.Thumbnails.FULL_SCREEN_KIND))
         videoView.background = bitmapD
         videoView.setOnClickListener {
