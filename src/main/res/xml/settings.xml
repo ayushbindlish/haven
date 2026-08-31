@@ -248,6 +248,52 @@
 
     <PreferenceCategory
         app:iconSpaceReserved="false"
+        android:title="@string/content_filter_category">
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="content_filter_enabled"
+            android:title="@string/content_filter_title"
+            android:summary="@string/content_filter_summary" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="true"
+            android:key="filter_ads"
+            android:title="@string/filter_ads_title" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="true"
+            android:key="filter_malware"
+            android:title="@string/filter_malware_title" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="filter_adult"
+            android:title="@string/filter_adult_title" />
+
+        <EditTextPreference
+            app:iconSpaceReserved="false"
+            android:dialogLayout="@layout/pref_dialog_edit_text"
+            android:inputType="textMultiLine"
+            android:key="filter_custom_domains"
+            android:title="@string/filter_custom_title"
+            android:summary="@string/filter_custom_summary" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="filter_log_enabled"
+            android:title="@string/filter_log_title"
+            android:summary="@string/filter_log_summary" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
         android:title="@string/network_alerts">
 
         <SwitchPreference

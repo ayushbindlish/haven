@@ -341,6 +341,35 @@ public class PreferenceManager {
         prefsEditor.commit();
     }
 
+    public boolean getContentFilterEnabled() {
+        return appSharedPrefs.getBoolean("content_filter_enabled", false);
+    }
+
+    public void setContentFilterEnabled(boolean v) {
+        prefsEditor.putBoolean("content_filter_enabled", v);
+        prefsEditor.commit();
+    }
+
+    public boolean getFilterAds() {
+        return appSharedPrefs.getBoolean("filter_ads", true);
+    }
+
+    public boolean getFilterMalware() {
+        return appSharedPrefs.getBoolean("filter_malware", true);
+    }
+
+    public boolean getFilterAdult() {
+        return appSharedPrefs.getBoolean("filter_adult", false);
+    }
+
+    public String getFilterCustomDomains() {
+        return appSharedPrefs.getString("filter_custom_domains", "");
+    }
+
+    public boolean getFilterLogEnabled() {
+        return appSharedPrefs.getBoolean("filter_log_enabled", false);
+    }
+
     public boolean getLocationTrackingEnabled() {
         return appSharedPrefs.getBoolean("location_tracking_enabled", false);
     }

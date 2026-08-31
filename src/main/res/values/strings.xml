@@ -236,6 +236,17 @@
     <string name="place_saved">Saved place: %1$s</string>
     <string name="location_unavailable">Couldn\'t get a location fix</string>
     <string name="location_permission_needed">Grant location permission to Haven first</string>
+    <string name="content_filter_category">Content filter</string>
+    <string name="content_filter_title">Block trackers / malware / adult sites</string>
+    <string name="content_filter_summary">Local DNS filter — only DNS is inspected, other traffic is untouched</string>
+    <string name="content_filter_running">Content filter active</string>
+    <string name="filter_ads_title">Block ads &amp; trackers</string>
+    <string name="filter_malware_title">Block known malware domains</string>
+    <string name="filter_adult_title">Block adult sites</string>
+    <string name="filter_custom_title">Custom blocked domains</string>
+    <string name="filter_custom_summary">One domain per line; subdomains are covered</string>
+    <string name="filter_log_title">Log blocked lookups</string>
+    <string name="filter_log_summary">Write blocked domain names to logcat (debug)</string>
     <string name="resume_monitoring_title">Haven monitoring was interrupted</string>
     <string name="resume_monitoring_text">Tap to resume protecting this device</string>
 

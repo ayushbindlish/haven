@@ -235,6 +235,16 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        if (requestCode == org.havenapp.main.net.ContentFilter.REQUEST_VPN_CONSENT) {
+            SwitchPreference sw = findPreference("content_filter_enabled");
+            if (resultCode == Activity.RESULT_OK) {
+                org.havenapp.main.net.ContentFilter.start(mActivity);
+            } else if (sw != null) {
+                sw.setChecked(false);
+            }
+            return;
+        }
+
         if (resultCode == Activity.RESULT_OK && data != null) {
             String onionHost = data.getStringExtra("hs_host");
             if (checkValidString(onionHost)) {
@@ -345,6 +355,25 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             }
             case PreferenceManager.CONFIG_BASE_STORAGE:
                 setDefaultStoragePath();
+                break;
+            case "content_filter_enabled": {
+                SwitchPreference sw = findPreference("content_filter_enabled");
+                if (sw != null && sw.isChecked()) {
+                    org.havenapp.main.net.ContentFilter.start(mActivity);
+                } else {
+                    org.havenapp.main.net.ContentFilter.stop(mActivity);
+                }
+                break;
+            }
+            case "filter_ads":
+            case "filter_malware":
+            case "filter_adult":
+            case "filter_custom_domains":
+                if (org.havenapp.main.net.ContentFilter.isRunning(mActivity)) {
+                    org.havenapp.main.net.ContentFilter.stop(mActivity);
+                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(
+                            () -> org.havenapp.main.net.ContentFilter.start(mActivity), 400);
+                }
                 break;
             case "location_tracking_enabled": {
                 SwitchPreference sw = findPreference("location_tracking_enabled");
