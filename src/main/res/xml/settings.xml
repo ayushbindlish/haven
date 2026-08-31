@@ -192,6 +192,34 @@
             android:title="@string/admin_title"
             android:summary="@string/admin_summary_off" />
 
+        <Preference
+            app:iconSpaceReserved="false"
+            android:key="duress_pin_set"
+            android:title="@string/duress_pin_title"
+            android:summary="@string/duress_pin_summary" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="duress_wipe"
+            android:title="@string/duress_wipe_title"
+            android:summary="@string/duress_wipe_summary" />
+
+        <EditTextPreference
+            app:iconSpaceReserved="false"
+            android:dialogLayout="@layout/pref_dialog_edit_text"
+            android:inputType="number"
+            android:key="deadman_hours_text"
+            android:title="@string/deadman_title"
+            android:summary="@string/deadman_summary" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="deadman_wipe"
+            android:title="@string/deadman_wipe_title"
+            android:summary="@string/deadman_wipe_summary" />
+
         <SwitchPreference
             app:iconSpaceReserved="false"
             android:defaultValue="true"

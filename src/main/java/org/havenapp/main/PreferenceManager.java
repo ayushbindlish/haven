@@ -341,6 +341,20 @@ public class PreferenceManager {
         prefsEditor.commit();
     }
 
+    public boolean getDuressWipe() { return appSharedPrefs.getBoolean("duress_wipe", false); }
+    public void setDuressWipe(boolean v) { prefsEditor.putBoolean("duress_wipe", v).commit(); }
+
+    public int getDeadmanHours() { return appSharedPrefs.getInt("deadman_hours", 0); }
+    public void setDeadmanHours(int h) { prefsEditor.putInt("deadman_hours", h).commit(); }
+    public boolean getDeadmanWipe() { return appSharedPrefs.getBoolean("deadman_wipe", false); }
+    public long getDeadmanCheckin() { return appSharedPrefs.getLong("deadman_checkin", 0L); }
+    public boolean getDeadmanFired() { return appSharedPrefs.getBoolean("deadman_fired", false); }
+    public void markCheckin() {
+        prefsEditor.putLong("deadman_checkin", System.currentTimeMillis())
+                .putBoolean("deadman_fired", false).commit();
+    }
+    public void setDeadmanFired(boolean v) { prefsEditor.putBoolean("deadman_fired", v).commit(); }
+
     public long getClockRefWall() { return appSharedPrefs.getLong("clock_ref_wall", 0L); }
     public long getClockRefUptime() { return appSharedPrefs.getLong("clock_ref_uptime", 0L); }
     public void setClockRef(long wall, long uptime) {

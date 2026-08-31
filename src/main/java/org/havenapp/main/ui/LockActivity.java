@@ -74,8 +74,12 @@ public class LockActivity extends AppCompatActivity {
         Button unlock = new Button(this);
         unlock.setText(R.string.pin_unlock);
         unlock.setOnClickListener(v -> {
-            if (pin.verify(input.getText().toString())) {
+            String entered = input.getText().toString();
+            if (pin.verify(entered)) {
                 unlock();
+            } else if (pin.isDuressPin(entered)) {
+                org.havenapp.main.security.DuressAction.fire(this);
+                unlock(); // indistinguishable from a normal unlock
             } else {
                 input.setText("");
                 int fails = pin.failedCount();
@@ -118,6 +122,7 @@ public class LockActivity extends AppCompatActivity {
 
     private void unlock() {
         PinManager.unlockedThisProcess = true;
+        new org.havenapp.main.PreferenceManager(this).markCheckin(); // dead-man's switch check-in
         setResult(RESULT_OK);
         finish();
     }

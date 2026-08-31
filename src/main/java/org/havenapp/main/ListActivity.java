@@ -302,6 +302,7 @@ public class ListActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         resourceManager = new ResourceManager(this);
+        preferences.markCheckin(); // dead-man's switch: opening Haven counts as a check-in
 
         // Force refresh the adapter when resuming
         if (eventListLD != null) {

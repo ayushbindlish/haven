@@ -17,6 +17,8 @@ public final class PinManager {
     private static final String PREFS = "org.havenapp.main";
     private static final String KEY_HASH = "pin_hash";
     private static final String KEY_SALT = "pin_salt";
+    private static final String KEY_DURESS_HASH = "pin_duress_hash";
+    private static final String KEY_DURESS_SALT = "pin_duress_salt";
     private static final String KEY_LOCK_ON_LAUNCH = "pin_lock_on_launch";
     private static final String KEY_PIN_TO_STOP = "pin_to_stop";
     private static final String KEY_FAILED = "pin_failed_count";
@@ -58,6 +60,28 @@ public final class PinManager {
 
     public int failedCount() {
         return sp.getInt(KEY_FAILED, 0);
+    }
+
+    public boolean hasDuressPin() {
+        return !TextUtils.isEmpty(sp.getString(KEY_DURESS_HASH, ""));
+    }
+
+    public void setDuressPin(String pin) {
+        if (TextUtils.isEmpty(pin)) {
+            sp.edit().remove(KEY_DURESS_HASH).remove(KEY_DURESS_SALT).apply();
+            return;
+        }
+        byte[] salt = new byte[16];
+        new SecureRandom().nextBytes(salt);
+        sp.edit().putString(KEY_DURESS_SALT, base64(salt))
+                .putString(KEY_DURESS_HASH, hash(pin, salt)).apply();
+    }
+
+    /** True if {@code pin} is the duress PIN (and different from the real one). */
+    public boolean isDuressPin(String pin) {
+        if (!hasDuressPin() || TextUtils.isEmpty(pin)) return false;
+        byte[] salt = unbase64(sp.getString(KEY_DURESS_SALT, ""));
+        return constantTimeEquals(hash(pin, salt), sp.getString(KEY_DURESS_HASH, ""));
     }
 
     public boolean isLockOnLaunch() {

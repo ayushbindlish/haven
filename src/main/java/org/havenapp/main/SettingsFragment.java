@@ -175,6 +175,16 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return true;
         });
 
+        Preference duressPref = findPreference("duress_pin_set");
+        if (duressPref != null) {
+            org.havenapp.main.security.PinManager pm2 = new org.havenapp.main.security.PinManager(mActivity);
+            duressPref.setSummary(pm2.hasDuressPin() ? R.string.pin_set_summary_set : R.string.duress_pin_summary);
+            duressPref.setOnPreferenceClickListener(p -> {
+                showDuressPinDialog();
+                return true;
+            });
+        }
+
         Preference adminPref = findPreference("admin_protect");
         refreshAdminSummary(adminPref);
         adminPref.setOnPreferenceClickListener(p -> {
@@ -356,6 +366,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             case PreferenceManager.CONFIG_BASE_STORAGE:
                 setDefaultStoragePath();
                 break;
+            case "deadman_hours_text": {
+                EditTextPreference p = findPreference("deadman_hours_text");
+                int h = 0;
+                try { h = Integer.parseInt(p.getText().trim()); } catch (Exception ignored) {}
+                preferences.setDeadmanHours(Math.max(0, h));
+                org.havenapp.main.service.DeadmanWorker.reschedule(mActivity);
+                break;
+            }
             case "remote_commands_enabled": {
                 SwitchPreference sw = findPreference("remote_commands_enabled");
                 if (sw != null && sw.isChecked()) {
@@ -521,6 +539,26 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
         });
+    }
+
+    private void showDuressPinDialog() {
+        android.content.Context ctx = getContext();
+        if (ctx == null) return;
+        android.widget.EditText input = new android.widget.EditText(ctx);
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+        input.setHint(R.string.pin_dialog_new);
+        org.havenapp.main.security.PinManager pm = new org.havenapp.main.security.PinManager(mActivity);
+        new androidx.appcompat.app.AlertDialog.Builder(ctx)
+                .setTitle(R.string.duress_pin_title)
+                .setView(input)
+                .setPositiveButton(android.R.string.ok, (d, w) -> {
+                    pm.setDuressPin(input.getText().toString());
+                    Preference p = findPreference("duress_pin_set");
+                    if (p != null) p.setSummary(pm.hasDuressPin()
+                            ? R.string.pin_set_summary_set : R.string.duress_pin_summary);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     private void refreshAdminSummary(Preference p) {

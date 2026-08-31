@@ -209,6 +209,14 @@
     <string name="admin_explanation">Lets Haven resist casual removal: the device admin must be turned off before the app can be uninstalled, and Haven alerts you when that happens.</string>
     <string name="admin_disable_warning">Turning this off removes Haven\'s tamper protection. An alert will be sent.</string>
     <string name="admin_disabled_alert">Haven device-admin was removed — possible tampering</string>
+    <string name="duress_pin_title">Duress PIN</string>
+    <string name="duress_pin_summary">A second PIN that unlocks normally but silently sends an alert + location</string>
+    <string name="duress_wipe_title">Wipe on duress PIN</string>
+    <string name="duress_wipe_summary">Also erase Haven\'s data when the duress PIN is used</string>
+    <string name="deadman_title">Dead-man\'s switch (hours)</string>
+    <string name="deadman_summary">If Haven isn\'t opened within this many hours, send an alert + location. 0 = off.</string>
+    <string name="deadman_wipe_title">Wipe on dead-man trigger</string>
+    <string name="deadman_wipe_summary">Also erase Haven\'s data if the dead-man\'s switch fires</string>
     <string name="alert_app_changes_title">Alert on app install / removal</string>
     <string name="alert_app_changes_summary">Send an alert whenever an app is added or removed</string>
     <string name="usage_report_title">Daily screen-time report</string>

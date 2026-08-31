@@ -84,6 +84,7 @@ public class HavenApp extends MultiDexApplication {
 
         RemoveDeletedFilesWorker.schedule(this);
         HousekeepingWorker.bootstrap(this); // coalesced audit + usage digest, power-adaptive cadence
+        org.havenapp.main.service.DeadmanWorker.reschedule(this);
     }
 
 
