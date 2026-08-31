@@ -9,6 +9,11 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <!-- Optional location tracking + geofences; all requested at runtime and off by default -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <!-- Android 13+: required for the foreground-service notification and intrusion alerts to appear -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Optional SMS alert channel; requested at runtime only when the user enables SMS alerts -->
@@ -106,7 +111,7 @@
 
         <service
             android:name=".service.MonitorService"
-            android:foregroundServiceType="microphone|camera"
+            android:foregroundServiceType="microphone|camera|location"
             android:exported="false" />
 
         <receiver
@@ -127,6 +132,15 @@
                 <action android:name="android.intent.action.PACKAGE_ADDED" />
                 <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
                 <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".security.TamperReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.location.MODE_CHANGED" />
+                <action android:name="android.intent.action.AIRPLANE_MODE" />
             </intent-filter>
         </receiver>
 

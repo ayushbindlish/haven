@@ -222,6 +222,20 @@
     <string name="sensor_light_summary">Trigger on sudden light changes (door opening, lights on)</string>
     <string name="sensor_baro_title">Barometer</string>
     <string name="sensor_baro_summary">Trigger on air-pressure spikes (door open/close); ignored if the device has no barometer</string>
+    <string name="tamper_alerts_title">Tamper alerts</string>
+    <string name="tamper_alerts_summary">Alert if location is turned off, or airplane mode is enabled at night</string>
+    <string name="location_category">Location</string>
+    <string name="location_tracking_title">Track this device\'s location</string>
+    <string name="location_tracking_summary">Periodic low-power location while monitoring (needs location permission)</string>
+    <string name="geofence_alerts_title">Place alerts</string>
+    <string name="geofence_alerts_summary">Alert on arriving at / leaving saved places</string>
+    <string name="add_place_title">Save current location as a place</string>
+    <string name="add_place_summary">Adds a ~150 m zone at where the device is now</string>
+    <string name="clear_places_title">Clear all saved places</string>
+    <string name="place_name_hint">Place name (e.g. Home, School)</string>
+    <string name="place_saved">Saved place: %1$s</string>
+    <string name="location_unavailable">Couldn\'t get a location fix</string>
+    <string name="location_permission_needed">Grant location permission to Haven first</string>
     <string name="resume_monitoring_title">Haven monitoring was interrupted</string>
     <string name="resume_monitoring_text">Tap to resume protecting this device</string>
 

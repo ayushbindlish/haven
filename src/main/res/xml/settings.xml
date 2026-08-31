@@ -206,6 +206,44 @@
             android:title="@string/boot_resume_title"
             android:summary="@string/boot_resume_summary" />
 
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="true"
+            android:key="tamper_alerts_enabled"
+            android:title="@string/tamper_alerts_title"
+            android:summary="@string/tamper_alerts_summary" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        android:title="@string/location_category">
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="location_tracking_enabled"
+            android:title="@string/location_tracking_title"
+            android:summary="@string/location_tracking_summary" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="true"
+            android:key="geofence_alerts_enabled"
+            android:title="@string/geofence_alerts_title"
+            android:summary="@string/geofence_alerts_summary" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            android:key="add_place_here"
+            android:title="@string/add_place_title"
+            android:summary="@string/add_place_summary" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            android:key="clear_places"
+            android:title="@string/clear_places_title" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

@@ -75,6 +75,7 @@ public class MonitorService extends LifecycleService implements SensorTriggerSin
      * Owns every non-camera sensor monitor and the low-power tier state machine.
      */
     private SensingCoordinator mCoordinator = null;
+    private org.havenapp.main.location.LocationTracker mLocationTracker = null;
 
     private PowerConnectionReceiver mPowerReceiver = null;
 
@@ -285,9 +286,13 @@ public class MonitorService extends LifecycleService implements SensorTriggerSin
         mBuilder.setVisibility(NotificationCompat.VISIBILITY_SECRET);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // API 34
-            startForeground(1, mBuilder.build(),
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE |
-                            ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA );
+            int type = ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                    | ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA;
+            if (mPrefs != null && mPrefs.getLocationTrackingEnabled()
+                    && org.havenapp.main.location.LocationTracker.hasPermission(this)) {
+                type |= ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION;
+            }
+            startForeground(1, mBuilder.build(), type);
         } else {
             startForeground(1, mBuilder.build());
         }
@@ -309,6 +314,11 @@ public class MonitorService extends LifecycleService implements SensorTriggerSin
         mCoordinator = new SensingCoordinator(this, this, this);
         mCoordinator.start();
 
+        if (mPrefs.getLocationTrackingEnabled()) {
+            mLocationTracker = new org.havenapp.main.location.LocationTracker(this);
+            mLocationTracker.start();
+        }
+
         mPrefs.activateMonitorService(true);
 
         mPowerReceiver = new PowerConnectionReceiver();
@@ -327,6 +337,11 @@ public class MonitorService extends LifecycleService implements SensorTriggerSin
         if (mCoordinator != null) {
             mCoordinator.stop();
             mCoordinator = null;
+        }
+
+        if (mLocationTracker != null) {
+            mLocationTracker.stop();
+            mLocationTracker = null;
         }
 
         if (mPrefs.getMonitorServiceActive()) {
@@ -355,6 +370,9 @@ public class MonitorService extends LifecycleService implements SensorTriggerSin
     public void onPowerConnectivityChanged(boolean charging) {
         if (mCoordinator != null) {
             mCoordinator.onPowerConnectivityChanged(charging);
+        }
+        if (mLocationTracker != null) {
+            mLocationTracker.applyPowerPolicy();
         }
     }
 

@@ -341,6 +341,23 @@ public class PreferenceManager {
         prefsEditor.commit();
     }
 
+    public boolean getLocationTrackingEnabled() {
+        return appSharedPrefs.getBoolean("location_tracking_enabled", false);
+    }
+
+    public void setLocationTrackingEnabled(boolean v) {
+        prefsEditor.putBoolean("location_tracking_enabled", v);
+        prefsEditor.commit();
+    }
+
+    public boolean getGeofenceAlertsEnabled() {
+        return appSharedPrefs.getBoolean("geofence_alerts_enabled", true);
+    }
+
+    public boolean getTamperAlertsEnabled() {
+        return appSharedPrefs.getBoolean("tamper_alerts_enabled", true);
+    }
+
     public boolean getSecurityAuditEnabled() {
         return appSharedPrefs.getBoolean("security_audit_enabled", true);
     }

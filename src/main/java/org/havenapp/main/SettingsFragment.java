@@ -162,6 +162,19 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return true;
         });
 
+        Preference addPlace = findPreference("add_place_here");
+        if (addPlace != null) addPlace.setOnPreferenceClickListener(p -> {
+            saveCurrentPlace();
+            return true;
+        });
+        Preference clearPlaces = findPreference("clear_places");
+        if (clearPlaces != null) clearPlaces.setOnPreferenceClickListener(p -> {
+            new org.havenapp.main.location.GeofenceStore(mActivity).clear();
+            android.widget.Toast.makeText(mActivity, R.string.clear_places_title,
+                    android.widget.Toast.LENGTH_SHORT).show();
+            return true;
+        });
+
         Preference adminPref = findPreference("admin_protect");
         refreshAdminSummary(adminPref);
         adminPref.setOnPreferenceClickListener(p -> {
@@ -333,6 +346,16 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             case PreferenceManager.CONFIG_BASE_STORAGE:
                 setDefaultStoragePath();
                 break;
+            case "location_tracking_enabled": {
+                SwitchPreference sw = findPreference("location_tracking_enabled");
+                if (sw != null && sw.isChecked()
+                        && !org.havenapp.main.location.LocationTracker.hasPermission(mActivity)) {
+                    ActivityCompat.requestPermissions(mActivity, new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 5);
+                }
+                break;
+            }
             case "usage_report_enabled": {
                 SwitchPreference sw = findPreference("usage_report_enabled");
                 org.havenapp.main.security.UsageReporter ur =
@@ -428,6 +451,39 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         } else if (view.getTag().equalsIgnoreCase("VideoLengthPickerDialog")) {
             preferences.setMonitoringTime(seconds);
         }
+    }
+
+    private void saveCurrentPlace() {
+        if (!org.havenapp.main.location.LocationTracker.hasPermission(mActivity)) {
+            android.widget.Toast.makeText(mActivity, R.string.location_permission_needed,
+                    android.widget.Toast.LENGTH_LONG).show();
+            return;
+        }
+        android.widget.Toast.makeText(mActivity, "…", android.widget.Toast.LENGTH_SHORT).show();
+        new org.havenapp.main.location.LocationTracker(mActivity).requestOneShot(loc -> {
+            if (loc == null || mActivity == null) {
+                if (mActivity != null) android.widget.Toast.makeText(mActivity,
+                        R.string.location_unavailable, android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+            android.widget.EditText input = new android.widget.EditText(mActivity);
+            input.setHint(R.string.place_name_hint);
+            new androidx.appcompat.app.AlertDialog.Builder(mActivity)
+                    .setTitle(R.string.add_place_title)
+                    .setView(input)
+                    .setPositiveButton(android.R.string.ok, (d, w) -> {
+                        String name = input.getText().toString().trim();
+                        if (name.isEmpty()) return;
+                        new org.havenapp.main.location.GeofenceStore(mActivity).add(
+                                new org.havenapp.main.location.GeofenceStore.Place(
+                                        name, loc.getLatitude(), loc.getLongitude(), 150f));
+                        android.widget.Toast.makeText(mActivity,
+                                getString(R.string.place_saved, name),
+                                android.widget.Toast.LENGTH_SHORT).show();
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+        });
     }
 
     private void refreshAdminSummary(Preference p) {
