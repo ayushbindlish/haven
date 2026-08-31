@@ -6,6 +6,8 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.util.Log;
 
+import androidx.lifecycle.LifecycleOwner;
+
 import org.havenapp.main.PreferenceManager;
 import org.havenapp.main.Utils;
 import org.havenapp.main.model.EventTrigger;
@@ -37,6 +39,7 @@ public class SensingCoordinator implements SensorTriggerSink {
 
     private final Context context;
     private final SensorTriggerSink outSink;
+    private final LifecycleOwner lifecycleOwner;
     private final PreferenceManager prefs;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final PowerManager.WakeLock wakeLock;
@@ -50,12 +53,14 @@ public class SensingCoordinator implements SensorTriggerSink {
     private BarometerMonitor baro;
     private AmbientLightMonitor light;
     private MicrophoneMonitor mic;
+    private CameraMonitor cam;
 
     private final Runnable lingerDown = this::enterIdle;
 
-    public SensingCoordinator(Context context, SensorTriggerSink outSink) {
+    public SensingCoordinator(Context context, SensorTriggerSink outSink, LifecycleOwner lifecycleOwner) {
         this.context = context.getApplicationContext();
         this.outSink = outSink;
+        this.lifecycleOwner = lifecycleOwner;
         this.prefs = new PreferenceManager(this.context);
 
         PowerManager pm = (PowerManager) this.context.getSystemService(Context.POWER_SERVICE);
@@ -120,6 +125,7 @@ public class SensingCoordinator implements SensorTriggerSink {
         startAmbient();
         startCheapMotion();
         startMic();
+        startCamera();
     }
 
     private void enterIdle() {
@@ -127,6 +133,7 @@ public class SensingCoordinator implements SensorTriggerSink {
         handler.removeCallbacks(lingerDown);
         stopCheapMotion();
         stopMic();
+        stopCamera();               // biggest single battery win: camera fully powered down
         if (!PreferenceManager.POWER_MODE_ADAPTIVE.equals(effectiveMode)) {
             stopAmbient();          // BATTERY_SAVER: nothing but the wake-up trigger
         } else {
@@ -144,6 +151,7 @@ public class SensingCoordinator implements SensorTriggerSink {
         startAmbient();
         startCheapMotion();
         startMic();
+        startCamera();
         // re-arm the fall-back timer on every fresh trigger
         handler.removeCallbacks(lingerDown);
         handler.postDelayed(lingerDown, ACTIVE_LINGER_MS);
@@ -180,6 +188,19 @@ public class SensingCoordinator implements SensorTriggerSink {
         if (light != null) { light.stop(context); light = null; }
     }
 
+    private void startCamera() {
+        if (cam == null) cam = new CameraMonitor(context, lifecycleOwner, this);
+        final CameraMonitor c = cam;
+        handler.post(c::start); // CameraX must bind on the main thread
+    }
+
+    private void stopCamera() {
+        if (cam == null) return;
+        final CameraMonitor c = cam;
+        cam = null;
+        handler.post(c::stop);
+    }
+
     private void startMic() {
         if (mic == null && !PreferenceManager.OFF.equals(prefs.getMicrophoneSensitivity())) {
             mic = new MicrophoneMonitor(context, this);
@@ -194,6 +215,7 @@ public class SensingCoordinator implements SensorTriggerSink {
         stopCheapMotion();
         stopAmbient();
         stopMic();
+        stopCamera();
         if (bump != null) { bump.stop(context); bump = null; }
     }
 

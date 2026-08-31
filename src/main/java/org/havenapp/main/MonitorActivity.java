@@ -422,6 +422,12 @@ public class MonitorActivity extends AppCompatActivity implements TimePickerDial
 
         btnBlankScreen.setVisibility(View.VISIBLE);
 
+        // The service (CameraX) now owns the camera while monitoring; release the
+        // preview camera so the two don't collide.
+        if (mFragmentCamera != null) {
+            mFragmentCamera.stopCamera();
+        }
+
         Intent serviceIntent = new Intent(this, MonitorService.class);
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

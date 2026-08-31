@@ -141,6 +141,14 @@ dependencies {
 
     implementation 'androidx.work:work-runtime:2.8.1'
     implementation 'androidx.work:work-runtime-ktx:2.8.1'
+
+    // CameraX - service-owned camera pipeline (Phase 3)
+    def camerax_version = '1.4.2'
+    implementation "androidx.camera:camera-core:$camerax_version"
+    implementation "androidx.camera:camera-camera2:$camerax_version"
+    implementation "androidx.camera:camera-lifecycle:$camerax_version"
+    implementation "androidx.camera:camera-video:$camerax_version"
+    implementation 'androidx.lifecycle:lifecycle-service:2.9.2'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.9.2'
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'

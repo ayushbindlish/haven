@@ -11,37 +11,28 @@ package org.havenapp.main.service;
 
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ServiceInfo;
 import android.graphics.Color;
-import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.PowerManager;
 import android.os.SystemClock;
-import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.SurfaceView;
-import android.view.WindowManager;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LifecycleService;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import com.otaliastudios.cameraview.CameraView;
 
 import org.havenapp.main.HavenApp;
 import org.havenapp.main.MonitorActivity;
@@ -55,12 +46,11 @@ import org.havenapp.main.resources.ResourceManager;
 import org.havenapp.main.sensors.PowerConnectionReceiver;
 import org.havenapp.main.sensors.SensingCoordinator;
 import org.havenapp.main.sensors.SensorTriggerSink;
-import org.havenapp.main.ui.CameraViewHolder;
 
 import java.util.Date;
 
 @SuppressLint("HandlerLeak")
-public class MonitorService extends Service implements SensorTriggerSink {
+public class MonitorService extends LifecycleService implements SensorTriggerSink {
 
     /**
      * Monitor instance
@@ -68,9 +58,6 @@ public class MonitorService extends Service implements SensorTriggerSink {
     private static MonitorService sInstance;
     private BroadcastReceiver screenStateReceiver;
     private boolean isScreenOn = true;
-    private CameraViewHolder backgroundCameraHolder;
-    private CameraView backgroundCameraView;
-    private WindowManager windowManager;
 
     /**
      * To show a notification on service start
@@ -164,6 +151,7 @@ public class MonitorService extends Service implements SensorTriggerSink {
 	 */
     @Override
     public void onCreate() {
+        super.onCreate();
         sInstance = this;
         mApp = (HavenApp)getApplication();
         mPrefs = new PreferenceManager(this);
@@ -183,6 +171,7 @@ public class MonitorService extends Service implements SensorTriggerSink {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
         Log.d("MonitorService", "onStartCommand called");
 
         // Immediately start foreground to establish camera access rights
@@ -244,14 +233,16 @@ public class MonitorService extends Service implements SensorTriggerSink {
         }
         stopSensors();
         stopForeground(true);
+        super.onDestroy();
     }
-	
+
     /**
-     * When binding to the service, we return an interface to our messenger
-     * for sending messages to the service.
+     * Legacy messenger binder (kept for the camera-config preview path). LifecycleService
+     * requires the super call for its lifecycle dispatch.
      */
     @Override
     public IBinder onBind(Intent intent) {
+        super.onBind(intent);
         return messenger.getBinder();
     }
     
@@ -315,7 +306,7 @@ public class MonitorService extends Service implements SensorTriggerSink {
         // set current event start date in prefs
         mPrefs.setCurrentSession(new Date(System.currentTimeMillis()));
 
-        mCoordinator = new SensingCoordinator(this, this);
+        mCoordinator = new SensingCoordinator(this, this, this);
         mCoordinator.start();
 
         mPrefs.activateMonitorService(true);

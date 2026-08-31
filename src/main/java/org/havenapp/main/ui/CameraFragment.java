@@ -25,6 +25,7 @@ import com.otaliastudios.cameraview.controls.Audio;
 import org.havenapp.main.PreferenceManager;
 import org.havenapp.main.R;
 import org.havenapp.main.model.EventTrigger;
+import org.havenapp.main.service.MonitorService;
 
 public final class CameraFragment extends Fragment {
 
@@ -68,7 +69,9 @@ public final class CameraFragment extends Fragment {
         super.onResume();
         initCamera();
 
-        cameraViewHolder.setMotionSensitivity(prefs.getCameraSensitivity());
+        if (cameraViewHolder != null) {
+            cameraViewHolder.setMotionSensitivity(prefs.getCameraSensitivity());
+        }
     }
 
     public void updateCamera ()
@@ -117,7 +120,12 @@ public final class CameraFragment extends Fragment {
 
     public void initCamera ()
     {
-
+        // Once monitoring is live the service owns the camera (CameraX). Don't open a
+        // second camera session here or the two will fight over the device.
+        if (MonitorService.getInstance() != null && MonitorService.getInstance().isRunning()) {
+            stopCamera();
+            return;
+        }
 
         PreferenceManager prefs = new PreferenceManager(getActivity());
 
