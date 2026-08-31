@@ -345,6 +345,10 @@ public class PreferenceManager {
         return appSharedPrefs.getBoolean("camera_preroll_enabled", true);
     }
 
+    public boolean getCameraPersonOnly() {
+        return appSharedPrefs.getBoolean("camera_person_only", false);
+    }
+
     public boolean getContentFilterEnabled() {
         return appSharedPrefs.getBoolean("content_filter_enabled", false);
     }

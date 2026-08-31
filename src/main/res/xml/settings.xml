@@ -96,6 +96,13 @@
             android:title="@string/camera_preroll_title"
             android:summary="@string/camera_preroll_summary" />
 
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="camera_person_only"
+            android:title="@string/camera_person_only_title"
+            android:summary="@string/camera_person_only_summary" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

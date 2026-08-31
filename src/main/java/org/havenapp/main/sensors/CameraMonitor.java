@@ -77,6 +77,9 @@ public class CameraMonitor {
     private volatile long minFrameIntervalMs = 200; // updated from PowerPolicy
     private volatile boolean allowVideo = true;
     private volatile boolean allowPreroll = true;
+    private volatile boolean personOnly = false;
+    private volatile boolean allowMl = false;
+    private PersonDetector personDetector;
     private boolean started;
     private boolean analyzerLogged;
 
@@ -106,6 +109,16 @@ public class CameraMonitor {
         allowVideo = PowerPolicy.allowVideoCapture(tier);
         allowPreroll = prefs.getCameraPrerollEnabled()
                 && (tier == PowerPolicy.Tier.FULL || tier == PowerPolicy.Tier.BALANCED);
+        allowMl = PowerPolicy.allowMl(tier);
+        personOnly = prefs.getCameraPersonOnly();
+        if (personOnly && allowMl && personDetector == null) {
+            try {
+                personDetector = new PersonDetector();
+            } catch (Throwable t) {
+                Log.w(TAG, "person detector unavailable", t);
+                personOnly = false;
+            }
+        }
     }
 
     /** Must be called on the main thread. */
@@ -133,6 +146,7 @@ public class CameraMonitor {
         started = false;
         analyzerLogged = false;
         synchronized (preroll) { preroll.clear(); }
+        if (personDetector != null) { personDetector.close(); personDetector = null; }
         finishRecording();
         if (cameraProvider != null) {
             try {
@@ -195,7 +209,9 @@ public class CameraMonitor {
         }
     }
 
+    @androidx.camera.core.ExperimentalGetImage
     private void analyze(@NonNull ImageProxy image) {
+        boolean deferClose = false;
         try {
             if (image.getFormat() != ImageFormat.YUV_420_888) return;
 
@@ -218,17 +234,28 @@ public class CameraMonitor {
                 pushPreroll(luma, w, h);
             }
 
-            if (lastLuma != null && lastLuma.length == luma.length) {
-                if (detector.detectMotion(lastLuma, luma, w, h) != null) {
-                    Log.i(TAG, "camera motion detected");
+            boolean motion = lastLuma != null && lastLuma.length == luma.length
+                    && detector.detectMotion(lastLuma, luma, w, h) != null;
+            lastLuma = luma;
+
+            if (motion) {
+                Log.i(TAG, "camera motion detected");
+                if (personOnly && allowMl && personDetector != null && image.getImage() != null) {
+                    deferClose = true;
+                    int rot = image.getImageInfo().getRotationDegrees();
+                    personDetector.detect(image.getImage(), rot, present -> {
+                        if (present) onMotion();
+                        else Log.i(TAG, "motion but no person -> suppressed");
+                        image.close();
+                    });
+                } else {
                     onMotion();
                 }
             }
-            lastLuma = luma;
         } catch (Exception e) {
             Log.w(TAG, "analyze failed", e);
         } finally {
-            image.close();
+            if (!deferClose) image.close();
         }
     }
 
