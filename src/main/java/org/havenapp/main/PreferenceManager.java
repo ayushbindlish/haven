@@ -341,6 +341,12 @@ public class PreferenceManager {
         prefsEditor.commit();
     }
 
+    public long getClockRefWall() { return appSharedPrefs.getLong("clock_ref_wall", 0L); }
+    public long getClockRefUptime() { return appSharedPrefs.getLong("clock_ref_uptime", 0L); }
+    public void setClockRef(long wall, long uptime) {
+        prefsEditor.putLong("clock_ref_wall", wall).putLong("clock_ref_uptime", uptime).commit();
+    }
+
     public boolean getMeshEnabled() {
         return appSharedPrefs.getBoolean("mesh_enabled", false);
     }

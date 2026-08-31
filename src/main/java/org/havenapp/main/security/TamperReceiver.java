@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.LocationManager;
-import android.provider.Settings;
+import android.os.SystemClock;
 
 import org.havenapp.main.PreferenceManager;
 import org.havenapp.main.alerts.AlertManager;
@@ -39,6 +39,19 @@ public class TamperReceiver extends BroadcastReceiver {
             if (on && (hour >= 22 || hour < 6)) {
                 msg = "Airplane mode turned on at " + hour + ":00";
             }
+        } else if (Intent.ACTION_TIME_CHANGED.equals(action)) {
+            long wall = System.currentTimeMillis();
+            long uptime = SystemClock.elapsedRealtime();
+            long lastWall = prefs.getClockRefWall();
+            long lastUptime = prefs.getClockRefUptime();
+            if (lastWall > 0) {
+                long expected = lastWall + (uptime - lastUptime);
+                long drift = Math.abs(wall - expected);
+                if (drift > 10 * 60_000L) {
+                    msg = "System clock changed by ~" + (drift / 60_000L) + " min";
+                }
+            }
+            prefs.setClockRef(wall, uptime);
         }
 
         if (msg != null) {

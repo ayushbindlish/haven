@@ -351,6 +351,9 @@ public class ListActivity extends AppCompatActivity {
             case R.id.action_security_audit:
                 runSecurityAudit();
                 break;
+            case R.id.action_verify_evidence:
+                verifyEvidence();
+                break;
         }
         return true;
     }
@@ -369,6 +372,23 @@ public class ListActivity extends AppCompatActivity {
 
     private void runCleanUpJob() {
         RemoveDeletedFilesWorker.runNow(this);
+    }
+
+    private void verifyEvidence() {
+        new Thread(() -> {
+            java.util.List<String> problems =
+                    org.havenapp.main.security.EvidenceLog.verify(this);
+            runOnUiThread(() -> {
+                if (isFinishing()) return;
+                new androidx.appcompat.app.AlertDialog.Builder(this)
+                        .setTitle(R.string.menu_verify_evidence)
+                        .setMessage(problems.isEmpty()
+                                ? getString(R.string.evidence_ok)
+                                : android.text.TextUtils.join("\n", problems))
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
+            });
+        }).start();
     }
 
     private void runSecurityAudit() {

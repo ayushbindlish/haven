@@ -51,6 +51,7 @@ public final class IntegrityAuditor {
             o.put("device_admins", deviceAdmins());
             o.put("installed_packages", installedPackages());
             o.put("root_indicators", rootIndicators());
+            o.put("sim", simFingerprint());
         } catch (Exception ignored) {
         }
         return o;
@@ -76,6 +77,7 @@ public final class IntegrityAuditor {
             diffSet(changes, old, cur, "device_admins", "Device-admin app");
             diffSet(changes, old, cur, "installed_packages", "App");
             diffScalar(changes, old, cur, "root_indicators", "Root indicators changed");
+            diffScalar(changes, old, cur, "sim", "SIM / carrier changed");
         } catch (Exception ignored) {
         }
         return changes;
@@ -120,6 +122,33 @@ public final class IntegrityAuditor {
             }
         }
         return TextUtils.join(",", set);
+    }
+
+    /** Coarse SIM fingerprint (operator + country + line) - readable with READ_PHONE_STATE. */
+    private String simFingerprint() {
+        try {
+            android.telephony.TelephonyManager tm =
+                    (android.telephony.TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            if (tm == null || tm.getSimState() != android.telephony.TelephonyManager.SIM_STATE_READY) {
+                return "no-sim";
+            }
+            String op = safe(tm.getSimOperator());
+            String co = safe(tm.getSimCountryIso());
+            String nm = "";
+            try {
+                nm = safe(tm.getSimOperatorName());
+            } catch (Exception ignored) {
+            }
+            return op + "/" + co + "/" + nm;
+        } catch (SecurityException se) {
+            return "unknown";
+        } catch (Exception e) {
+            return "unknown";
+        }
+    }
+
+    private static String safe(String s) {
+        return s == null ? "" : s;
     }
 
     private int rootIndicators() {

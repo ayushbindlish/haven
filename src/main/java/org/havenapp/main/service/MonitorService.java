@@ -436,6 +436,8 @@ public class MonitorService extends LifecycleService implements SensorTriggerSin
                 .getEventTriggerDAO().insert(eventTrigger);
         eventTrigger.setId(eventTriggerId);
 
+        org.havenapp.main.security.EvidenceLog.append(this, alertType, value);
+
         Log.d("MonitorService", "Event saved: type=" + alertType + " value=" + value + " triggerId=" + eventTriggerId);
 
         if (doNotification) {

@@ -292,6 +292,8 @@
 
     <string name="menu_device_setup">Device setup…</string>
     <string name="menu_security_audit">Security audit…</string>
+    <string name="menu_verify_evidence">Verify evidence log…</string>
+    <string name="evidence_ok">Evidence log intact — every event and file hashes cleanly and nothing has been removed.</string>
     <string name="audit_baseline_set">Baseline recorded. Future changes to apps, admins, accessibility services and developer settings will be reported.</string>
     <string name="audit_no_changes">No changes since the last baseline.</string>
     <string name="audit_changes_title">Device changes detected</string>
