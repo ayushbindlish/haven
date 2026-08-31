@@ -350,6 +350,54 @@
 
     <PreferenceCategory
         app:iconSpaceReserved="false"
+        android:title="@string/backup_category">
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="backup_enabled"
+            android:title="@string/backup_enabled_title"
+            android:summary="@string/backup_enabled_summary" />
+
+        <EditTextPreference
+            app:iconSpaceReserved="false"
+            android:dialogLayout="@layout/pref_dialog_edit_text"
+            android:inputType="textUri"
+            android:key="backup_url"
+            android:title="@string/backup_url_title"
+            android:summary="@string/backup_url_summary" />
+
+        <EditTextPreference
+            app:iconSpaceReserved="false"
+            android:dialogLayout="@layout/pref_dialog_edit_text"
+            android:inputType="text"
+            android:key="backup_user"
+            android:title="@string/backup_user_title" />
+
+        <EditTextPreference
+            app:iconSpaceReserved="false"
+            android:dialogLayout="@layout/pref_dialog_edit_password"
+            android:inputType="textPassword"
+            android:key="backup_password"
+            android:title="@string/backup_password_title" />
+
+        <EditTextPreference
+            app:iconSpaceReserved="false"
+            android:dialogLayout="@layout/pref_dialog_edit_password"
+            android:inputType="textPassword"
+            android:key="backup_passphrase"
+            android:title="@string/backup_passphrase_title"
+            android:summary="@string/backup_passphrase_summary" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            android:key="backup_now"
+            android:title="@string/backup_now_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
         android:title="@string/remote_cmd_category">
 
         <SwitchPreference

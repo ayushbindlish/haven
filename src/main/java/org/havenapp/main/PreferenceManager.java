@@ -404,6 +404,14 @@ public class PreferenceManager {
         prefsEditor.commit();
     }
 
+    public boolean getBackupEnabled() { return appSharedPrefs.getBoolean("backup_enabled", false); }
+    public String getBackupUrl() { return appSharedPrefs.getString("backup_url", ""); }
+    public String getBackupUser() { return appSharedPrefs.getString("backup_user", ""); }
+    public String getBackupPassword() { return appSharedPrefs.getString("backup_password", ""); }
+    public String getBackupPassphrase() { return appSharedPrefs.getString("backup_passphrase", ""); }
+    public long getLastBackup() { return appSharedPrefs.getLong("backup_last", 0L); }
+    public void setLastBackup(long ts) { prefsEditor.putLong("backup_last", ts).commit(); }
+
     public boolean getEncryptDatabase() {
         return appSharedPrefs.getBoolean("encrypt_database", false);
     }

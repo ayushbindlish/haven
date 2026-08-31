@@ -175,6 +175,19 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return true;
         });
 
+        Preference backupNow = findPreference("backup_now");
+        if (backupNow != null) backupNow.setOnPreferenceClickListener(p -> {
+            if (!org.havenapp.main.backup.BackupManager.configured(mActivity)) {
+                android.widget.Toast.makeText(mActivity, R.string.backup_not_configured,
+                        android.widget.Toast.LENGTH_LONG).show();
+            } else {
+                android.widget.Toast.makeText(mActivity, R.string.backup_started,
+                        android.widget.Toast.LENGTH_SHORT).show();
+                org.havenapp.main.service.BackupWorker.runNow(mActivity);
+            }
+            return true;
+        });
+
         Preference duressPref = findPreference("duress_pin_set");
         if (duressPref != null) {
             org.havenapp.main.security.PinManager pm2 = new org.havenapp.main.security.PinManager(mActivity);
@@ -369,6 +382,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             case "encrypt_database":
                 android.widget.Toast.makeText(mActivity,
                         R.string.restart_to_apply, android.widget.Toast.LENGTH_LONG).show();
+                break;
+            case "backup_enabled":
+            case "backup_url":
+            case "backup_user":
+            case "backup_password":
+            case "backup_passphrase":
+                org.havenapp.main.service.BackupWorker.reschedule(mActivity);
                 break;
             case "deadman_hours_text": {
                 EditTextPreference p = findPreference("deadman_hours_text");
