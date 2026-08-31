@@ -348,6 +348,9 @@ public class ListActivity extends AppCompatActivity {
             case R.id.action_device_setup:
                 DeviceSetupHelper.INSTANCE.showChecklist(this);
                 break;
+            case R.id.action_security_audit:
+                runSecurityAudit();
+                break;
         }
         return true;
     }
@@ -366,6 +369,30 @@ public class ListActivity extends AppCompatActivity {
 
     private void runCleanUpJob() {
         RemoveDeletedFilesWorker.runNow(this);
+    }
+
+    private void runSecurityAudit() {
+        new Thread(() -> {
+            org.havenapp.main.security.IntegrityAuditor auditor =
+                    new org.havenapp.main.security.IntegrityAuditor(this);
+            boolean hadBaseline = auditor.hasBaseline();
+            java.util.List<String> changes = auditor.auditAgainstBaseline();
+            runOnUiThread(() -> {
+                if (isFinishing()) return;
+                androidx.appcompat.app.AlertDialog.Builder b =
+                        new androidx.appcompat.app.AlertDialog.Builder(this);
+                if (!hadBaseline) {
+                    b.setMessage(R.string.audit_baseline_set);
+                } else if (changes.isEmpty()) {
+                    b.setMessage(R.string.audit_no_changes);
+                } else {
+                    b.setTitle(R.string.audit_changes_title)
+                     .setMessage(android.text.TextUtils.join("\n\n", changes))
+                     .setNeutralButton(R.string.audit_reset, (d, w) -> auditor.resetBaseline());
+                }
+                b.setPositiveButton(R.string.audit_dismiss, null).show();
+            });
+        }).start();
     }
 
     private void onAllEventsRemoved(List<Event> removedEvents) {
