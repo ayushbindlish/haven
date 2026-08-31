@@ -24,7 +24,7 @@ public class SMSAlertChannel implements AlertChannel {
 
     @Override
     public boolean isEnabled() {
-        return prefs.getSMSEnabled() && !TextUtils.isEmpty(prefs.getRemotePhoneNumber());
+        return prefs.isRemoteNotificationActive() && !TextUtils.isEmpty(prefs.getRemotePhoneNumber());
     }
 
     @Override

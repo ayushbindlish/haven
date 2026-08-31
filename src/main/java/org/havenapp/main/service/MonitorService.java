@@ -311,11 +311,6 @@ public class MonitorService extends LifecycleService implements SensorTriggerSin
 
         mPrefs.activateMonitorService(true);
 
-        if (mPrefs.getHeartbeatActive()){
-            SignalSender sender = SignalSender.getInstance(this, mPrefs.getSignalUsername());
-            sender.startHeartbeatTimer(mPrefs.getHeartbeatNotificationTimeMs());
-        }
-
         mPowerReceiver = new PowerConnectionReceiver();
         // register our power status receivers (single filter, both actions)
         IntentFilter powerFilter = new IntentFilter();
@@ -336,10 +331,6 @@ public class MonitorService extends LifecycleService implements SensorTriggerSin
 
         if (mPrefs.getMonitorServiceActive()) {
             mPrefs.activateMonitorService(false);
-            if (mPrefs.getHeartbeatActive()) {
-                SignalSender sender = SignalSender.getInstance(this, mPrefs.getSignalUsername());
-                sender.stopHeartbeatTimer();
-            }
         }
 
         if (mPowerReceiver != null) {

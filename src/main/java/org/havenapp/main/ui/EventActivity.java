@@ -16,7 +16,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.stfalcon.imageviewer.StfalconImageViewer;
 import com.stfalcon.imageviewer.loader.ImageLoader;
 
-import org.apache.http.client.utils.URIBuilder;
 import org.havenapp.main.R;
 import org.havenapp.main.Utils;
 import org.havenapp.main.database.HavenEventDB;

@@ -57,19 +57,12 @@ public class PreferenceManager {
     public static final String CAMERA="camera";
     public static final String CAMERA_SENSITIVITY="camera_sensitivity";
     public static final String CONFIG_MOVEMENT ="config_movement";
-    public static final String HEARTBEAT_MONITOR_ACTIVE="heartbeat_monitor_active";
-    public static final String HEARTBEAT_MONITOR_DELAY="heartbeat_monitor_delay";
-    public static final String HEARTBEAT_MONITOR_MESSAGE="heartbeat_monitor_message";
     public static final String MONITOR_SERVICE_ACTIVE="monitor_service_active";
     private static final String FLASH_ACTIVE="flash_active";
     private static final String MICROPHONE_ACTIVE="microphone_active";
     private static final String MICROPHONE_SENSITIVITY="microphone_sensitivity";
     public static final String CONFIG_SOUND = "config_sound";
     public static final String CONFIG_TIME_DELAY = "config_delay_time";
-    public static final String REGISTER_SIGNAL = "register_signal";
-    public static final String VERIFY_SIGNAL = "verify_signal";
-    public static final String VOICE_VERIFY_SIGNAL = "voice_verify_signal";
-    public static final String RESET_SIGNAL_CONFIG = "reset_signal_config";
     private static final String UNLOCK_CODE="unlock_code";
 	
     private static final String ACCESS_TOKEN="access_token";
@@ -84,9 +77,6 @@ public class PreferenceManager {
     public static final String REMOTE_ACCESS_ACTIVE = "remote_access_active";
     public static final String REMOTE_ACCESS_ONION = "remote_access_onion";
     public static final String REMOTE_ACCESS_CRED = "remote_access_credential";
-
-    private static final String SIGNAL_USERNAME = "signal_username";
-    private static final String SIGNAL_VERIFIED_USERNAME = "signal_verified_username";
 
     private static final String FIRST_LAUNCH = "first_launch";
 
@@ -143,43 +133,6 @@ public class PreferenceManager {
 
     public void setSMSEnabled(boolean enabled) {
         prefsEditor.putBoolean("sms_enabled", enabled);
-        prefsEditor.commit();
-    }
-
-    // Matrix preferences
-    public String getMatrixUsername() {
-        return appSharedPrefs.getString("matrix_username", "");
-    }
-
-    public void setMatrixUsername(String username) {
-        prefsEditor.putString("matrix_username", username);
-        prefsEditor.commit();
-    }
-
-    public String getMatrixHomeserver() {
-        return appSharedPrefs.getString("matrix_homeserver", "https://matrix.org");
-    }
-
-    public void setMatrixHomeserver(String homeserver) {
-        prefsEditor.putString("matrix_homeserver", homeserver);
-        prefsEditor.commit();
-    }
-
-    public String getMatrixRoomId() {
-        return appSharedPrefs.getString("matrix_room_id", "");
-    }
-
-    public void setMatrixRoomId(String roomId) {
-        prefsEditor.putString("matrix_room_id", roomId);
-        prefsEditor.commit();
-    }
-
-    public boolean getMatrixEnabled() {
-        return appSharedPrefs.getBoolean("matrix_enabled", false);
-    }
-
-    public void setMatrixEnabled(boolean enabled) {
-        prefsEditor.putBoolean("matrix_enabled", enabled);
         prefsEditor.commit();
     }
 
@@ -276,60 +229,6 @@ public class PreferenceManager {
     public void setSessionEnabled(boolean enabled) {
         prefsEditor.putBoolean("session_enabled", enabled);
         prefsEditor.commit();
-    }
-
-
-
-    /**
-     * Returns the Signal username registered. This may not be a good way to check for
-     * Signal set up since this may not be verified.
-     *
-     * Usages should be checked with {@link #isSignalVerified()}
-     *
-     * @see #isSignalVerified()
-     *
-     * @return the Signal username; null when nothing is set up
-     */
-    public String getSignalUsername ()
-    {
-        return appSharedPrefs.getString(SIGNAL_USERNAME,null);
-    }
-
-    public void setSignalUsername (String signalUsername)
-    {
-        prefsEditor.putString(SIGNAL_USERNAME,signalUsername);
-        prefsEditor.commit();
-    }
-
-    /**
-     * Returns the Signal username verified. This may not be a good way to check for
-     * Signal set up since this may invalidated by a call to register with a different username.
-     *
-     * Usages should be checked with {@link #isSignalVerified()}
-     *
-     * @see #isSignalVerified()
-     *
-     * @return the verified Signal username; null when no Signal username is verified even though registered.
-     */
-    @Nullable
-    public String getVerifiedSignalUsername() {
-        return appSharedPrefs.getString(SIGNAL_VERIFIED_USERNAME, null);
-    }
-
-    public void setVerifiedSignalUsername(String verifiedSignalUsername) {
-        prefsEditor.putString(SIGNAL_VERIFIED_USERNAME, verifiedSignalUsername);
-        prefsEditor.commit();
-    }
-
-    /**
-     * Checks if Signal is registered and verified for the Signal username returned by
-     * {@link #getSignalUsername()}
-     *
-     * @return true iff registered Signal username is same as that of the verified one.
-     */
-    public boolean isSignalVerified() {
-        return !TextUtils.isEmpty(getSignalUsername()) &&
-                getSignalUsername().equals(getVerifiedSignalUsername());
     }
 
     public void activateRemoteAccess (boolean active) {
@@ -519,15 +418,6 @@ public class PreferenceManager {
         prefsEditor.commit();
     }
 
-    public void setVoiceVerification(boolean active) {
-        prefsEditor.putBoolean(VOICE_VERIFY_SIGNAL, active);
-        prefsEditor.commit();
-    }
-
-    public boolean getVoiceVerificationEnabled() {
-        return appSharedPrefs.getBoolean(VOICE_VERIFY_SIGNAL, false);
-    }
-
     public String getDirPath() {
     	return DIR_PATH;
     }
@@ -567,43 +457,6 @@ public class PreferenceManager {
     public void setNotificationTimeMs (int notificationTimeMs) {
         prefsEditor.putInt(NOTIFICATION_TIME,notificationTimeMs);
         prefsEditor.commit();
-    }
-
-    public void activateHeartbeat(boolean active) {
-        prefsEditor.putBoolean(HEARTBEAT_MONITOR_ACTIVE, active);
-        prefsEditor.commit();
-    }
-
-    public void setHeartbeatMonitorNotifications (int notificationTimeMs) {
-        prefsEditor.putInt(HEARTBEAT_MONITOR_DELAY,notificationTimeMs);
-        prefsEditor.commit();
-    }
-
-    public boolean getHeartbeatActive() {
-        return appSharedPrefs.getBoolean(HEARTBEAT_MONITOR_ACTIVE, false);
-    }
-
-    public int getHeartbeatNotificationTimeMs () {
-        return appSharedPrefs.getInt(HEARTBEAT_MONITOR_DELAY,300000);
-    }
-
-    public String getHeartbeatMonitorMessage ()
-    {
-        return appSharedPrefs.getString(HEARTBEAT_MONITOR_MESSAGE,null);
-    }
-
-    public void setHeartbeatMonitorMessage (String hearbeatMessage)
-    {
-        prefsEditor.putString(HEARTBEAT_MONITOR_MESSAGE, hearbeatMessage);
-        prefsEditor.commit();
-    }
-
-    public String getHeartbeatPrefix() {
-        return context.getString(R.string.hearbeat_monitor_initial_message_1);
-    }
-
-    public String getHeartbeatSuffix() {
-        return context.getString(R.string.hearbeat_monitor_initial_message_2);
     }
 
 

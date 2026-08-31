@@ -33,8 +33,6 @@ public class AlertManager {
         channels.add(new SMSAlertChannel(context));
         channels.add(new TelegramAlertChannel(context));
         channels.add(new NtfyAlertChannel(context));
-        channels.add(new SignalAlertChannel(context));
-        channels.add(new MatrixAlertChannel(context));
         channels.add(new BriarAlertChannel(context));
         channels.add(new SessionAlertChannel(context));
     }

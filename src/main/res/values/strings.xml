@@ -187,6 +187,9 @@
     <string name="alert_test_sent">Test alert sent via %1$d channel(s)</string>
     <string name="alert_test_none">No alert channels are enabled and configured</string>
 
+    <string name="sms_alerts_title">SMS alerts</string>
+    <string name="sms_alerts_summary">Text the number below when a sensor triggers (works with no data connection)</string>
+
     <string name="network_alerts">Network alerts</string>
     <string name="telegram_enabled">Telegram</string>
     <string name="telegram_summary">Send alerts (with photo/video/audio) to a Telegram bot chat. Not end-to-end encrypted.</string>

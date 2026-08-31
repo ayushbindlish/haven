@@ -61,8 +61,4 @@ public class SettingsActivity extends AppCompatActivity {
     public void onBackPressed() {
        mFragment.save();
     }
-
-    public void switchClickListener(View view) {
-        mFragment.checkCallToVerify(view);
-    }
 }

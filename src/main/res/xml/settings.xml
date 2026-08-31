@@ -85,7 +85,8 @@
             app:iconSpaceReserved="false"
             android:defaultValue="false"
             android:key="remote_notification_active"
-            android:title="@string/remote_notification_label" />
+            android:title="@string/sms_alerts_title"
+            android:summary="@string/sms_alerts_summary" />
 
         <EditTextPreference
             app:iconSpaceReserved="false"
@@ -98,64 +99,12 @@
 
         <EditTextPreference
             app:iconSpaceReserved="false"
-            android:dialogLayout="@layout/pref_dialog_edit_text_hint_signal"
-            android:dialogMessage="@string/register_signal_desc"
-            android:inputType="phone"
-            android:key="register_signal"
-            android:summary="@string/signal_dialog_summary"
-            android:title="@string/signal_number" />
-
-        <EditTextPreference
-            app:iconSpaceReserved="false"
-            android:dialogLayout="@layout/pref_dialog_edit_text"
-            android:dialogMessage="@string/enter_verification"
-            android:inputType="number"
-            android:key="verify_signal"
-            android:summary="@string/verification_dialog_summary"
-            android:title="@string/verify_signal" />
-
-        <EditTextPreference
-            app:iconSpaceReserved="false"
             android:dialogLayout="@layout/pref_dialog_edit_text"
             android:dialogMessage="@string/notification_time_dialog"
             android:inputType="number"
             android:key="notification_time"
             android:summary="@string/notification_time_summary"
             android:title="@string/notification_time" />
-
-        <Preference
-            app:iconSpaceReserved="false"
-            android:key="reset_signal_config"
-            android:title="@string/reset_signal_configuration" />
-
-    </PreferenceCategory>
-    <PreferenceCategory
-        app:iconSpaceReserved="false"
-        android:title="@string/hearbeat_monitor">
-
-        <SwitchPreference
-            app:iconSpaceReserved="false"
-            android:defaultValue="false"
-            android:key="heartbeat_monitor_active"
-            android:title="@string/hearbeat_monitor_enable" />
-
-        <EditTextPreference
-            app:iconSpaceReserved="false"
-            android:dialogLayout="@layout/pref_dialog_edit_text"
-            android:dialogMessage="@string/heartbeat_time_dialog"
-            android:inputType="number"
-            android:key="heartbeat_monitor_delay"
-            android:summary="@string/hearbeat_monitor_dialog"
-            android:title="@string/hearbeat_monitor_summary"/>
-
-        <EditTextPreference
-            app:iconSpaceReserved="false"
-            android:dialogLayout="@layout/pref_dialog_edit_text"
-            android:dialogMessage="@string/hearbeat_message_dialog"
-            android:inputType="text"
-            android:key="heartbeat_monitor_message"
-            android:title="@string/hearbeat_message_title"
-            android:summary="@string/hearbeat_message_summary" />
 
     </PreferenceCategory>
     <PreferenceCategory
