@@ -146,8 +146,9 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-service:2.9.2'
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'com.google.android.gms:play-services-location:21.3.0'
-    // On-device person detection; ML Kit auto-selects NNAPI / GPU where available.
-    implementation 'com.google.mlkit:image-labeling:17.0.9'
+    // On-device person detection; model delivered via Play Services so the APK stays
+    // small. ML Kit auto-selects NNAPI / GPU where available.
+    implementation 'com.google.android.gms:play-services-mlkit-image-labeling:16.0.8'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.9.2'
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
