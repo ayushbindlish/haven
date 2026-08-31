@@ -73,10 +73,17 @@ public class CameraMonitor {
     private int[] lastLuma;
     private long lastCaptureAt;
     private long lastAnalyzedAt;
+    private long lastPrerollAt;
     private volatile long minFrameIntervalMs = 200; // updated from PowerPolicy
     private volatile boolean allowVideo = true;
+    private volatile boolean allowPreroll = true;
     private boolean started;
     private boolean analyzerLogged;
+
+    /** Ring of recent low-res greyscale JPEGs so a capture includes the run-up to the trigger. */
+    private static final int PREROLL_MAX = 10;
+    private static final long PREROLL_INTERVAL_MS = 500;
+    private final java.util.ArrayDeque<byte[]> preroll = new java.util.ArrayDeque<>(PREROLL_MAX);
 
     public CameraMonitor(Context context, LifecycleOwner lifecycleOwner, SensorTriggerSink sink) {
         this.context = context.getApplicationContext();
@@ -97,6 +104,8 @@ public class CameraMonitor {
         int fps = Math.max(1, PowerPolicy.cameraAnalysisFps(tier));
         minFrameIntervalMs = 1000L / fps;
         allowVideo = PowerPolicy.allowVideoCapture(tier);
+        allowPreroll = prefs.getCameraPrerollEnabled()
+                && (tier == PowerPolicy.Tier.FULL || tier == PowerPolicy.Tier.BALANCED);
     }
 
     /** Must be called on the main thread. */
@@ -123,6 +132,7 @@ public class CameraMonitor {
     public void stop() {
         started = false;
         analyzerLogged = false;
+        synchronized (preroll) { preroll.clear(); }
         finishRecording();
         if (cameraProvider != null) {
             try {
@@ -203,6 +213,11 @@ public class CameraMonitor {
                 Log.i(TAG, "analyzer running @ " + w + "x" + h + " threshold=" + prefs.getCameraSensitivity());
             }
 
+            if (allowPreroll && now - lastPrerollAt >= PREROLL_INTERVAL_MS) {
+                lastPrerollAt = now;
+                pushPreroll(luma, w, h);
+            }
+
             if (lastLuma != null && lastLuma.length == luma.length) {
                 if (detector.detectMotion(lastLuma, luma, w, h) != null) {
                     Log.i(TAG, "camera motion detected");
@@ -236,6 +251,39 @@ public class CameraMonitor {
         return out;
     }
 
+    private void pushPreroll(int[] luma, int w, int h) {
+        try {
+            android.graphics.Bitmap bmp = org.havenapp.main.sensors.media.ImageCodec
+                    .lumaToBitmapGreyscale(luma, w, h);
+            java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+            bmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 55, bos);
+            bmp.recycle();
+            synchronized (preroll) {
+                if (preroll.size() >= PREROLL_MAX) preroll.pollFirst();
+                preroll.addLast(bos.toByteArray());
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void flushPreroll(String stamp) {
+        byte[][] frames;
+        synchronized (preroll) {
+            if (preroll.isEmpty()) return;
+            frames = preroll.toArray(new byte[0][]);
+        }
+        File dir = sessionDir();
+        int i = 0;
+        for (byte[] f : frames) {
+            File out = new File(dir, stamp + String.format(java.util.Locale.US, ".preroll-%02d.jpg", i++));
+            try (java.io.FileOutputStream fos = new java.io.FileOutputStream(out)) {
+                fos.write(f);
+                if (sink != null) sink.onSensorTrigger(EventTrigger.CAMERA, out.getAbsolutePath());
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
     private void onMotion() {
         long now = SystemClock.elapsedRealtime();
         if (now - lastCaptureAt < CAPTURE_DEBOUNCE_MS) return;
@@ -259,6 +307,7 @@ public class CameraMonitor {
                 new ImageCapture.OnImageSavedCallback() {
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults results) {
+                        if (allowPreroll) flushPreroll(ts);
                         if (sink != null) sink.onSensorTrigger(EventTrigger.CAMERA, out.getAbsolutePath());
                         maybeRecordClip();
                     }

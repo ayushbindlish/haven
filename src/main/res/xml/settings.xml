@@ -89,6 +89,13 @@
             android:title="@string/sensor_baro_title"
             android:summary="@string/sensor_baro_summary" />
 
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="true"
+            android:key="camera_preroll_enabled"
+            android:title="@string/camera_preroll_title"
+            android:summary="@string/camera_preroll_summary" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

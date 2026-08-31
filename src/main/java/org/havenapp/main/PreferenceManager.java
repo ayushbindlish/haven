@@ -341,6 +341,10 @@ public class PreferenceManager {
         prefsEditor.commit();
     }
 
+    public boolean getCameraPrerollEnabled() {
+        return appSharedPrefs.getBoolean("camera_preroll_enabled", true);
+    }
+
     public boolean getContentFilterEnabled() {
         return appSharedPrefs.getBoolean("content_filter_enabled", false);
     }
