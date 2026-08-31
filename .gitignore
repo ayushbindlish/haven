@@ -65,3 +65,7 @@ captures/
 
 # Keystore files
 *.jks
+
+# Local dev notes (not for the repo)
+DEV_*.md
+*.local.md
