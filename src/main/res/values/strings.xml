@@ -226,6 +226,9 @@
     <string name="security_audit_summary">Every 6h, check for new accessibility services, device admins, apps, root, developer settings and alert on changes</string>
     <string name="boot_resume_title">Resume monitoring after reboot</string>
     <string name="boot_resume_summary">After a restart or update, show a notification to re-arm Haven</string>
+    <string name="restart_to_apply">Restart Haven to apply this change</string>
+    <string name="encrypt_db_title">Encrypt the event database</string>
+    <string name="encrypt_db_summary">SQLCipher with a hardware-backed key. Existing events are migrated on the next app start.</string>
     <string name="encrypt_media_title">Encrypt captures at rest</string>
     <string name="encrypt_media_summary">New photos, video and audio are stored AES-256 encrypted with a hardware-backed key; decrypted only for viewing. Existing files are left as-is.</string>
     <string name="camera_person_only_title">Only capture when a person is seen</string>

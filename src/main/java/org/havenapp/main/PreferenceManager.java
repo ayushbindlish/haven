@@ -404,6 +404,15 @@ public class PreferenceManager {
         prefsEditor.commit();
     }
 
+    public boolean getEncryptDatabase() {
+        return appSharedPrefs.getBoolean("encrypt_database", false);
+    }
+
+    public void setEncryptDatabase(boolean v) {
+        prefsEditor.putBoolean("encrypt_database", v);
+        prefsEditor.commit();
+    }
+
     public boolean getCameraPersonOnly() {
         return appSharedPrefs.getBoolean("camera_person_only", false);
     }

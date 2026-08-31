@@ -41,11 +41,27 @@ abstract class HavenEventDB : RoomDatabase() {
                         dbIntent.action = DB_INIT_STATUS
                         LocalBroadcastManager.getInstance(context).sendBroadcast(dbIntent)
 
-                        INSTANCE = Room.databaseBuilder(context.applicationContext,
+                        val builder = Room.databaseBuilder(context.applicationContext,
                                 HavenEventDB::class.java, "haven.db")
                                 .allowMainThreadQueries() // todo remove this
                                 .addMigrations(RoomMigration())
-                                .build()
+
+                        val prefs = org.havenapp.main.PreferenceManager(context)
+                        if (prefs.encryptDatabase) {
+                            try {
+                                if (org.havenapp.main.security.DbCrypto.ensureEncrypted(context)) {
+                                    builder.openHelperFactory(
+                                        net.zetetic.database.sqlcipher.SupportOpenHelperFactory(
+                                            org.havenapp.main.security.DbCrypto.passphrase(context)))
+                                } else {
+                                    prefs.setEncryptDatabase(false) // migration failed -> stay plaintext
+                                }
+                            } catch (t: Throwable) {
+                                prefs.setEncryptDatabase(false)
+                            }
+                        }
+
+                        INSTANCE = builder.build()
 
                         // notify interested components that db initialization has succeeded
                         dbIntent = Intent()

@@ -366,6 +366,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             case PreferenceManager.CONFIG_BASE_STORAGE:
                 setDefaultStoragePath();
                 break;
+            case "encrypt_database":
+                android.widget.Toast.makeText(mActivity,
+                        R.string.restart_to_apply, android.widget.Toast.LENGTH_LONG).show();
+                break;
             case "deadman_hours_text": {
                 EditTextPreference p = findPreference("deadman_hours_text");
                 int h = 0;

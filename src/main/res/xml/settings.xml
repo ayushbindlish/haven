@@ -110,6 +110,13 @@
             android:title="@string/encrypt_media_title"
             android:summary="@string/encrypt_media_summary" />
 
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="encrypt_database"
+            android:title="@string/encrypt_db_title"
+            android:summary="@string/encrypt_db_summary" />
+
     </PreferenceCategory>
 
     <PreferenceCategory
