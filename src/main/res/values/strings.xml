@@ -251,6 +251,11 @@
     <string name="filter_custom_summary">One domain per line; subdomains are covered</string>
     <string name="filter_log_title">Log blocked lookups</string>
     <string name="filter_log_summary">Write blocked domain names to logcat (debug)</string>
+    <string name="remote_cmd_category">Remote commands (SMS)</string>
+    <string name="remote_cmd_title">Accept commands by text message</string>
+    <string name="remote_cmd_summary">Text \"&lt;secret&gt; STATUS | LOCATE | PHOTO | ARM | DISARM | SNOOZE &lt;min&gt; | WIPE CONFIRM\" to this phone</string>
+    <string name="remote_cmd_secret_title">Command secret</string>
+    <string name="remote_cmd_secret_summary">Every command must begin with this word. Keep it private.</string>
     <string name="resume_monitoring_title">Haven monitoring was interrupted</string>
     <string name="resume_monitoring_text">Tap to resume protecting this device</string>
 

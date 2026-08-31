@@ -318,6 +318,11 @@ public class CameraMonitor {
         ContextCompat.getMainExecutor(context).execute(this::captureStill);
     }
 
+    /** Remote PHOTO command: take a still now, ignoring the debounce. */
+    public void captureNow() {
+        ContextCompat.getMainExecutor(context).execute(this::captureStill);
+    }
+
     private File sessionDir() {
         File dir = new File(context.getExternalFilesDir(null), prefs.getDefaultMediaStoragePath());
         //noinspection ResultOfMethodCallIgnored

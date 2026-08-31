@@ -230,6 +230,14 @@ public class SensingCoordinator implements SensorTriggerSink {
         handler.post(c::start); // CameraX must bind on the main thread
     }
 
+    /** Remote PHOTO: make sure the camera is up, then grab a frame. */
+    public synchronized void requestPhoto() {
+        if (tier == Tier.OFF) return;
+        if (tier == Tier.IDLE) enterActive(EventTrigger.CAMERA, "remote photo");
+        final CameraMonitor c = cam;
+        if (c != null) handler.postDelayed(c::captureNow, 1200);
+    }
+
     private void stopCamera() {
         if (cam == null) return;
         final CameraMonitor c = cam;

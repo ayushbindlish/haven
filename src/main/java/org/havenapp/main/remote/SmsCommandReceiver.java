@@ -1,0 +1,49 @@
+package org.havenapp.main.remote;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
+import android.provider.Telephony;
+import android.telephony.SmsManager;
+import android.telephony.SmsMessage;
+
+import org.havenapp.main.PreferenceManager;
+
+/**
+ * Receives SMS and runs any that start with the configured secret through
+ * {@link RemoteCommandHandler}, replying to the sender by SMS.
+ */
+public class SmsCommandReceiver extends BroadcastReceiver {
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        if (!Telephony.Sms.Intents.SMS_RECEIVED_ACTION.equals(intent.getAction())) return;
+        if (!new PreferenceManager(context).getRemoteCommandsEnabled()) return;
+
+        SmsMessage[] msgs = Telephony.Sms.Intents.getMessagesFromIntent(intent);
+        if (msgs == null || msgs.length == 0) return;
+
+        StringBuilder body = new StringBuilder();
+        String from = null;
+        for (SmsMessage m : msgs) {
+            body.append(m.getMessageBody());
+            from = m.getOriginatingAddress();
+        }
+        final String sender = from;
+        RemoteCommandHandler.handle(context.getApplicationContext(), body.toString(), reply -> {
+            if (sender == null) return;
+            try {
+                SmsManager sm = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                        ? context.getSystemService(SmsManager.class)
+                        : SmsManager.getDefault();
+                if (sm != null) {
+                    for (String part : sm.divideMessage(reply)) {
+                        sm.sendTextMessage(sender, null, part, null, null);
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+        });
+    }
+}

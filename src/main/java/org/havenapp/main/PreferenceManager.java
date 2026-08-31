@@ -341,6 +341,28 @@ public class PreferenceManager {
         prefsEditor.commit();
     }
 
+    public boolean getRemoteCommandsEnabled() {
+        return appSharedPrefs.getBoolean("remote_commands_enabled", false);
+    }
+
+    public void setRemoteCommandsEnabled(boolean v) {
+        prefsEditor.putBoolean("remote_commands_enabled", v);
+        prefsEditor.commit();
+    }
+
+    public String getRemoteCommandSecret() {
+        return appSharedPrefs.getString("remote_command_secret", "");
+    }
+
+    public long getSnoozeUntil() {
+        return appSharedPrefs.getLong("snooze_until", 0L);
+    }
+
+    public void setSnoozeUntil(long ts) {
+        prefsEditor.putLong("snooze_until", ts);
+        prefsEditor.commit();
+    }
+
     public boolean getCameraPrerollEnabled() {
         return appSharedPrefs.getBoolean("camera_preroll_enabled", true);
     }

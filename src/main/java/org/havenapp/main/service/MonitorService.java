@@ -366,6 +366,11 @@ public class MonitorService extends LifecycleService implements SensorTriggerSin
         }
     }
 
+    /** Remote PHOTO command entry point. */
+    public void requestPhoto() {
+        if (mCoordinator != null) mCoordinator.requestPhoto();
+    }
+
     /** Called by {@link PowerConnectionReceiver} when the charger is plugged / unplugged. */
     public void onPowerConnectivityChanged(boolean charging) {
         if (mCoordinator != null) {

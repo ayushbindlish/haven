@@ -356,6 +356,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             case PreferenceManager.CONFIG_BASE_STORAGE:
                 setDefaultStoragePath();
                 break;
+            case "remote_commands_enabled": {
+                SwitchPreference sw = findPreference("remote_commands_enabled");
+                if (sw != null && sw.isChecked()) {
+                    ActivityCompat.requestPermissions(mActivity, new String[]{
+                            Manifest.permission.RECEIVE_SMS, Manifest.permission.SEND_SMS}, 6);
+                }
+                break;
+            }
             case "content_filter_enabled": {
                 SwitchPreference sw = findPreference("content_filter_enabled");
                 if (sw != null && sw.isChecked()) {
