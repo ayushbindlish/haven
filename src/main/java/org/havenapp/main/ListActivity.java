@@ -82,6 +82,7 @@ public class ListActivity extends AppCompatActivity {
     private IResourceManager resourceManager;
 
     private final static int REQUEST_CODE_INTRO = 1001;
+    private final static int REQUEST_CODE_LOCK = 1002;
 
     private LiveData<List<Event>> eventListLD;
 
@@ -139,6 +140,14 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
         Log.d("Main", "onCreate");
+
+        org.havenapp.main.security.PinManager pinManager =
+                new org.havenapp.main.security.PinManager(this);
+        if (pinManager.hasPin() && pinManager.isLockOnLaunch()
+                && !org.havenapp.main.security.PinManager.unlockedThisProcess) {
+            startActivityForResult(new android.content.Intent(this,
+                    org.havenapp.main.ui.LockActivity.class), REQUEST_CODE_LOCK);
+        }
 
         resourceManager = new ResourceManager(this);
         preferences = new PreferenceManager(this.getApplicationContext());
@@ -281,6 +290,11 @@ public class ListActivity extends AppCompatActivity {
             preferences.setFirstLaunch(false);
             Intent i = new Intent(ListActivity.this, MonitorActivity.class);
             startActivity(i);
+        }
+        else if (requestCode == REQUEST_CODE_LOCK && resultCode != RESULT_OK)
+        {
+            // Failed / cancelled unlock: don't reveal the log.
+            finishAffinity();
         }
     }
 

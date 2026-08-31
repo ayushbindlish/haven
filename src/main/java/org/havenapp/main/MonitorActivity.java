@@ -302,8 +302,24 @@ public class MonitorActivity extends AppCompatActivity implements TimePickerDial
         txtTimer.setText(getTimerText(valM));
     }
 
+    private final static int REQUEST_STOP_LOCK = 1003;
+
     private void doCancel() {
         boolean wasTimer = false;
+
+        // Disarming requires the PIN if the user set one and enabled "PIN to stop".
+        if (mIsMonitoring) {
+            org.havenapp.main.security.PinManager pin =
+                    new org.havenapp.main.security.PinManager(this);
+            if (pin.hasPin() && pin.isPinToStop()
+                    && !org.havenapp.main.security.PinManager.unlockedThisProcess) {
+                android.content.Intent i = new android.content.Intent(this,
+                        org.havenapp.main.ui.LockActivity.class);
+                i.putExtra(org.havenapp.main.ui.LockActivity.EXTRA_REASON, "stop");
+                startActivityForResult(i, REQUEST_STOP_LOCK);
+                return;
+            }
+        }
 
         // If screen is blanked, unblank it first to ensure proper cleanup
         if (isBlankScreenActive) {
@@ -367,6 +383,8 @@ public class MonitorActivity extends AppCompatActivity implements TimePickerDial
             if (mFragmentCamera != null) {
                 mFragmentCamera.initCamera();
             }
+        } else if (requestCode == REQUEST_STOP_LOCK && resultCode == RESULT_OK) {
+            doCancel(); // PIN accepted -> proceed with the disarm
         }
     }
 

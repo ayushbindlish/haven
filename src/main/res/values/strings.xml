@@ -187,6 +187,25 @@
     <string name="alert_test_sent">Test alert sent via %1$d channel(s)</string>
     <string name="alert_test_none">No alert channels are enabled and configured</string>
 
+    <string name="pin_enter_title">Enter PIN to unlock Haven</string>
+    <string name="pin_hint">PIN</string>
+    <string name="pin_unlock">Unlock</string>
+    <string name="pin_use_pin">Use PIN</string>
+    <string name="pin_wrong">Wrong PIN (%1$d attempts)</string>
+    <string name="security_category">Security</string>
+    <string name="pin_set_title">App PIN</string>
+    <string name="pin_set_summary_none">Not set — tap to set a PIN</string>
+    <string name="pin_set_summary_set">PIN is set — tap to change or clear</string>
+    <string name="pin_dialog_new">New PIN (leave blank to clear)</string>
+    <string name="pin_dialog_confirm">Confirm PIN</string>
+    <string name="pin_mismatch">PINs did not match</string>
+    <string name="pin_saved">PIN saved</string>
+    <string name="pin_cleared">PIN cleared</string>
+    <string name="pin_lock_on_launch">Require PIN to open Haven</string>
+    <string name="pin_to_stop">Require PIN to stop monitoring</string>
+    <string name="resume_monitoring_title">Haven monitoring was interrupted</string>
+    <string name="resume_monitoring_text">Tap to resume protecting this device</string>
+
     <string name="sms_alerts_title">SMS alerts</string>
     <string name="sms_alerts_summary">Text the number below when a sensor triggers (works with no data connection)</string>
 

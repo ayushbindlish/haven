@@ -154,6 +154,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return true;
         });
 
+        org.havenapp.main.security.PinManager pin = new org.havenapp.main.security.PinManager(mActivity);
+        Preference pinPref = findPreference("pin_set");
+        pinPref.setSummary(pin.hasPin() ? R.string.pin_set_summary_set : R.string.pin_set_summary_none);
+        pinPref.setOnPreferenceClickListener(p -> {
+            showPinDialog();
+            return true;
+        });
+
         // Kick off the runtime-permission chain: camera -> mic -> notifications.
         askForPermission(Manifest.permission.CAMERA, 2);
     }
@@ -395,6 +403,47 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         } else if (view.getTag().equalsIgnoreCase("VideoLengthPickerDialog")) {
             preferences.setMonitoringTime(seconds);
         }
+    }
+
+    private void showPinDialog() {
+        android.content.Context ctx = getContext();
+        if (ctx == null) return;
+        int pad = (int) (16 * getResources().getDisplayMetrics().density);
+        android.widget.LinearLayout box = new android.widget.LinearLayout(ctx);
+        box.setOrientation(android.widget.LinearLayout.VERTICAL);
+        box.setPadding(pad, pad, pad, 0);
+
+        android.widget.EditText p1 = new android.widget.EditText(ctx);
+        p1.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+        p1.setHint(R.string.pin_dialog_new);
+        android.widget.EditText p2 = new android.widget.EditText(ctx);
+        p2.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+        p2.setHint(R.string.pin_dialog_confirm);
+        box.addView(p1);
+        box.addView(p2);
+
+        org.havenapp.main.security.PinManager pin = new org.havenapp.main.security.PinManager(mActivity);
+        new androidx.appcompat.app.AlertDialog.Builder(ctx)
+                .setTitle(R.string.pin_set_title)
+                .setView(box)
+                .setPositiveButton(android.R.string.ok, (d, w) -> {
+                    String a = p1.getText().toString();
+                    String b = p2.getText().toString();
+                    if (!a.equals(b)) {
+                        android.widget.Toast.makeText(ctx, R.string.pin_mismatch, android.widget.Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    pin.setPin(a);
+                    android.widget.Toast.makeText(ctx,
+                            a.isEmpty() ? R.string.pin_cleared : R.string.pin_saved,
+                            android.widget.Toast.LENGTH_SHORT).show();
+                    Preference pref = findPreference("pin_set");
+                    if (pref != null) {
+                        pref.setSummary(pin.hasPin() ? R.string.pin_set_summary_set : R.string.pin_set_summary_none);
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     private void requestChangeBatteryOptimizations() {

@@ -138,6 +138,30 @@
 
     <PreferenceCategory
         app:iconSpaceReserved="false"
+        android:title="@string/security_category">
+
+        <Preference
+            app:iconSpaceReserved="false"
+            android:key="pin_set"
+            android:title="@string/pin_set_title"
+            android:summary="@string/pin_set_summary_none" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="pin_lock_on_launch"
+            android:title="@string/pin_lock_on_launch" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="pin_to_stop"
+            android:title="@string/pin_to_stop" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
         android:title="@string/network_alerts">
 
         <SwitchPreference
