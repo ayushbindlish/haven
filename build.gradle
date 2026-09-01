@@ -3,24 +3,22 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
-        maven { url 'https://repo1.maven.org/maven2' }
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        maven { url = 'https://jitpack.io' }
+        maven { url = 'https://repo1.maven.org/maven2' }
+        maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.7.2'
+        classpath 'com.android.tools.build:gradle:8.11.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
 /* gets the version name from the latest Git tag, stripping the leading v off */
 def getVersionName = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
+    def out = providers.exec {
         commandLine 'git', 'describe', '--tags', '--always', '--abbrev=0'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
+    }.standardOutput.asText.get().trim()
+    return out
 }
 
 apply plugin: 'com.android.application'
@@ -31,15 +29,15 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
-        maven { url 'https://repo1.maven.org/maven2' }
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        maven { url = 'https://jitpack.io' }
+        maven { url = 'https://repo1.maven.org/maven2' }
+        maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
 
     project.ext {
         version_number = getVersionName()
         group_info = "haven"
-        buildToolsVersion = "34.0.0"
+        buildToolsVersion = "36.0.0"
         minSdkVersion = 24
         targetSdkVersion = 35
     }
@@ -51,7 +49,7 @@ android {
         options.compilerArgs += ["-Xlint:unchecked"]
     }
 
-    compileSdkVersion 35
+    compileSdk 36
 
     buildFeatures {
         viewBinding true
@@ -163,9 +161,9 @@ dependencies {
     // QR encode/decode for parent<->child pairing (pure-Java, no android deps)
     implementation 'com.google.zxing:core:3.5.3'
     // Optional built-in Tor (SOCKS proxy) so Orbot isn't required. Bundles the native
-    // tor binary per ABI (~7-8 MB each). 0.4.9.5 is the newest release that still builds
-    // on AGP 8.7 / compileSdk 35 (0.4.9.6+ demand compileSdk 36/37); it ships Java-21
-    // bytecode (hence jvmTarget 21 above) and its .so files are 16 KB-page aligned.
+    // tor binary per ABI (~7-8 MB each), Java-21 bytecode, 16 KB-page aligned .so files.
+    // On compileSdk 36 we can now go up to 0.4.9.6 (minCompileSdk 36); 0.4.9.6.2+ want
+    // compileSdk 37. 0.4.9.5 (minCompileSdk 1) is fine and already 16 KB-aligned.
     implementation 'info.guardianproject:tor-android:0.4.9.5'
     implementation 'info.guardianproject:jtorctl:0.4.5.7'
     // Encrypted event database
