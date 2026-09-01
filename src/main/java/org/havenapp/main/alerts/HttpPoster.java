@@ -27,6 +27,10 @@ public final class HttpPoster {
 
     private static final int CONNECT_TIMEOUT_MS = 15000;
     private static final int READ_TIMEOUT_MS = 30000;
+    // Tor needs much longer: the first circuit after a cold bootstrap can take 30-60 s,
+    // and every request carries onion-routing latency.
+    private static final int TOR_CONNECT_TIMEOUT_MS = 60000;
+    private static final int TOR_READ_TIMEOUT_MS = 60000;
 
     private static Proxy torProxy() {
         return new Proxy(Proxy.Type.SOCKS, TorController.socksAddress());
@@ -44,8 +48,8 @@ public final class HttpPoster {
     private static HttpURLConnection open(String urlStr, boolean tor) throws Exception {
         URL url = new URL(urlStr);
         HttpURLConnection c = (HttpURLConnection) (tor ? url.openConnection(torProxy()) : url.openConnection());
-        c.setConnectTimeout(CONNECT_TIMEOUT_MS);
-        c.setReadTimeout(READ_TIMEOUT_MS);
+        c.setConnectTimeout(tor ? TOR_CONNECT_TIMEOUT_MS : CONNECT_TIMEOUT_MS);
+        c.setReadTimeout(tor ? TOR_READ_TIMEOUT_MS : READ_TIMEOUT_MS);
         c.setInstanceFollowRedirects(true);
         return c;
     }
