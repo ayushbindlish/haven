@@ -9,16 +9,22 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.github.paolorotolo.appintro.AppIntro;
-import com.github.paolorotolo.appintro.AppIntroFragment;
+import com.github.appintro.AppIntro;
+import com.github.appintro.AppIntroFragment;
+import com.github.appintro.AppIntroPageTransformerType;
 
 import org.havenapp.main.MonitorActivity;
 import org.havenapp.main.PreferenceManager;
 import org.havenapp.main.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PPAppIntro extends AppIntro {
 
@@ -26,35 +32,39 @@ public class PPAppIntro extends AppIntro {
     private static final int REQUEST_MIC_CONFIG = 1002;
     private static final int REQUEST_CAMERA_CONFIG = 1003;
 
+    /** Slides in order, so we can map the current fragment back to an index (AppIntro 6
+     *  removed the public pager). */
+    private final List<Fragment> slides = new ArrayList<>();
+    private int currentPosition = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // AppIntro 5.x predates edge-to-edge; pad its content clear of the bars.
+        // Edge-to-edge (targetSdk 36): pad the intro content clear of the system bars.
         org.havenapp.main.Utils.applyBarInsets(findViewById(android.R.id.content), true, true, true);
 
-        // Configure intro animations and behavior
-        setFadeAnimation();
+        setTransformer(AppIntroPageTransformerType.Fade.INSTANCE);
         setWizardMode(true);
-        setBackButtonVisibilityWithDone(true);
-        showPagerIndicator(true);
+        setIndicatorEnabled(true);
         setIndicatorColor(
-                getResources().getColor(R.color.colorAccent),
-                getResources().getColor(R.color.colorPrimaryLight)
+                ContextCompat.getColor(this, R.color.colorAccent),
+                ContextCompat.getColor(this, R.color.colorPrimaryLight)
         );
 
         // Slide 1: Welcome & App Purpose
-        addSlide(AppIntroFragment.newInstance(
+        track(AppIntroFragment.createInstance(
                 getString(R.string.intro1_title),
                 getString(R.string.intro1_desc),
                 R.drawable.web_hi_res_512,
-                getResources().getColor(R.color.colorPrimaryDark)
+                ContextCompat.getColor(this, R.color.colorPrimaryDark),
+                0, 0, 0, 0, 0
         ));
 
         // Slide 2: Privacy & Security Focus
         CustomSlideBigText privacySlide = CustomSlideBigText.newInstance(R.layout.custom_slide_big_text);
         privacySlide.setTitle(getString(R.string.intro2_title));
-        addSlide(privacySlide);
+        track(privacySlide);
 
         // Slide 3: Sensor Configuration
         CustomSlideBigText configSlide = CustomSlideBigText.newInstance(R.layout.custom_slide_big_text);
@@ -65,12 +75,12 @@ public class PPAppIntro extends AppIntro {
                 startConfigurationFlow();
             }
         });
-        addSlide(configSlide);
+        track(configSlide);
 
         // Slide 4: How It Works
         CustomSlideBigText howItWorksSlide = CustomSlideBigText.newInstance(R.layout.custom_slide_big_text);
         howItWorksSlide.setTitle(getString(R.string.intro4_desc));
-        addSlide(howItWorksSlide);
+        track(howItWorksSlide);
 
         // Slide 5: Notifications Setup
         final CustomSlideNotify notifySlide = CustomSlideNotify.newInstance(R.layout.custom_slide_notify);
@@ -82,27 +92,45 @@ public class PPAppIntro extends AppIntro {
                     PreferenceManager pm = new PreferenceManager(PPAppIntro.this);
                     pm.setRemotePhoneNumber(phoneNumber);
                     Toast.makeText(PPAppIntro.this, R.string.phone_saved, Toast.LENGTH_SHORT).show();
-                    moveToNextSlide();
+                    goToNextSlide();
                 } else {
                     Toast.makeText(PPAppIntro.this, R.string.invalid_phone_number, Toast.LENGTH_SHORT).show();
                 }
             }
         });
-        addSlide(notifySlide);
+        track(notifySlide);
 
         // Slide 6: Ready to Protect
-        addSlide(AppIntroFragment.newInstance(
+        track(AppIntroFragment.createInstance(
                 getString(R.string.intro5_title),
                 getString(R.string.intro5_desc),
                 R.drawable.web_hi_res_512,
-                getResources().getColor(R.color.colorPrimaryDark)
+                ContextCompat.getColor(this, R.color.colorPrimaryDark),
+                0, 0, 0, 0, 0
         ));
 
-        // Customize button text
         setDoneText(getString(R.string.onboarding_action_end));
+        setSkipButtonEnabled(false);
 
-        // Hide skip button for security app
-        showSkipButton(false);
+        // Back on the first slide asks to confirm exit; elsewhere it steps back a slide.
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (currentPosition <= 0) {
+                    new AlertDialog.Builder(PPAppIntro.this)
+                            .setTitle(R.string.exit_setup_title)
+                            .setMessage(R.string.exit_setup_message)
+                            .setPositiveButton(R.string.continue_setup, null)
+                            .setNegativeButton(R.string.exit_anyway, (dialog, which) -> {
+                                setDefaultPreferences();
+                                finish();
+                            })
+                            .show();
+                } else {
+                    goToPreviousSlide();
+                }
+            }
+        });
     }
 
     private void startConfigurationFlow() {
@@ -182,12 +210,8 @@ public class PPAppIntro extends AppIntro {
                 phoneNumber.matches("^[+]?[0-9\\s\\-\\(\\)]+$");
     }
 
-    private void moveToNextSlide() {
-        getPager().setCurrentItem(getPager().getCurrentItem() + 1);
-    }
-
     @Override
-    public void onSkipPressed(Fragment currentFragment) {
+    protected void onSkipPressed(Fragment currentFragment) {
         super.onSkipPressed(currentFragment);
         // Set default preferences if user skips
         setDefaultPreferences();
@@ -195,7 +219,7 @@ public class PPAppIntro extends AppIntro {
     }
 
     @Override
-    public void onDonePressed(Fragment currentFragment) {
+    protected void onDonePressed(Fragment currentFragment) {
         super.onDonePressed(currentFragment);
 
         // Mark onboarding as complete
@@ -228,12 +252,13 @@ public class PPAppIntro extends AppIntro {
     }
 
     @Override
-    public void onSlideChanged(@Nullable Fragment oldFragment, @Nullable Fragment newFragment) {
+    protected void onSlideChanged(@Nullable Fragment oldFragment, @Nullable Fragment newFragment) {
         super.onSlideChanged(oldFragment, newFragment);
 
-        // Optional: Add slide-specific logic here
-        int position = getPager().getCurrentItem();
-        switch (position) {
+        int pos = newFragment == null ? -1 : slides.indexOf(newFragment);
+        if (pos >= 0) currentPosition = pos;
+
+        switch (currentPosition) {
             case 0:
                 // Welcome slide
                 break;
@@ -248,6 +273,12 @@ public class PPAppIntro extends AppIntro {
         }
     }
 
+    /** addSlide() is final in AppIntro 6, so track order here for onSlideChanged mapping. */
+    private void track(Fragment fragment) {
+        slides.add(fragment);
+        addSlide(fragment);
+    }
+
     private void checkSensorAvailability() {
         // Check if required sensors are available and show warnings if not
         // This could be implemented to inform users about missing sensors
@@ -259,25 +290,6 @@ public class PPAppIntro extends AppIntro {
         String existingNumber = pm.getRemotePhoneNumber();
         if (!existingNumber.isEmpty()) {
             // Prefill the phone number field if it exists
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        // Custom back button behavior for security app
-        if (getPager().getCurrentItem() == 0) {
-            // On first slide, show exit confirmation
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.exit_setup_title)
-                    .setMessage(R.string.exit_setup_message)
-                    .setPositiveButton(R.string.continue_setup, null)
-                    .setNegativeButton(R.string.exit_anyway, (dialog, which) -> {
-                        setDefaultPreferences();
-                        finish();
-                    })
-                    .show();
-        } else {
-            super.onBackPressed();
         }
     }
 }
