@@ -41,7 +41,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -116,17 +115,19 @@ public class ListActivity extends AppCompatActivity {
         }
     };
 
-    private BroadcastReceiver dbBroadcastReceiver = new BroadcastReceiver() {
+    private final org.havenapp.main.HavenEventBus.Listener dbBusListener =
+            new org.havenapp.main.HavenEventBus.Listener() {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getIntExtra(DB_INIT_STATUS, 0) == DB_INIT_START) {
+        public void onHavenEvent(String action, android.os.Bundle extras) {
+            if (!DB_INIT_STATUS.equals(action) || extras == null) return;
+            if (extras.getInt(DB_INIT_STATUS, 0) == DB_INIT_START) {
                 progressDialog = new ProgressDialog(ListActivity.this);
                 progressDialog.setTitle(resourceManager.getString(R.string.please_wait));
                 progressDialog.setMessage(resourceManager.getString(R.string.migrating_data));
                 progressDialog.setCancelable(false);
                 progressDialog.setCanceledOnTouchOutside(false);
                 progressDialog.show();
-            } else if (intent.getIntExtra(DB_INIT_STATUS, 0) == DB_INIT_END) {
+            } else if (extras.getInt(DB_INIT_STATUS, 0) == DB_INIT_END) {
                 if (progressDialog != null)
                     progressDialog.dismiss();
             }
@@ -158,8 +159,7 @@ public class ListActivity extends AppCompatActivity {
         overflowIcon.setColorFilter(ContextCompat.getColor(this, android.R.color.white), PorterDuff.Mode.SRC_ATOP);
         toolbar.setOverflowIcon(overflowIcon);
         setSupportActionBar(toolbar);
-        LocalBroadcastManager.getInstance(this).registerReceiver(dbBroadcastReceiver,
-                new IntentFilter(DB_INIT_STATUS));
+        org.havenapp.main.HavenEventBus.register(dbBusListener);
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(llm);
@@ -368,7 +368,7 @@ public class ListActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(dbBroadcastReceiver);
+        org.havenapp.main.HavenEventBus.unregister(dbBusListener);
     }
 
     private void removeAllEvents()

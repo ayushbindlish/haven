@@ -32,7 +32,6 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleService;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.havenapp.main.HavenApp;
 import org.havenapp.main.MonitorActivity;
@@ -122,14 +121,14 @@ public class MonitorService extends LifecycleService implements SensorTriggerSin
                 if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
                     isScreenOn = false;
                     // Just send broadcast - no background camera
-                    Intent screenOffIntent = new Intent("screen_state_changed");
-                    screenOffIntent.putExtra("screen_on", false);
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(screenOffIntent);
+                    android.os.Bundle offB = new android.os.Bundle();
+                    offB.putBoolean("screen_on", false);
+                    org.havenapp.main.HavenEventBus.post("screen_state_changed", offB);
                 } else if (Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
                     isScreenOn = true;
-                    Intent screenOnIntent = new Intent("screen_state_changed");
-                    screenOnIntent.putExtra("screen_on", true);
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(screenOnIntent);
+                    android.os.Bundle onB = new android.os.Bundle();
+                    onB.putBoolean("screen_on", true);
+                    org.havenapp.main.HavenEventBus.post("screen_state_changed", onB);
                 }
             }
         };
@@ -397,9 +396,9 @@ public class MonitorService extends LifecycleService implements SensorTriggerSin
         boolean doNotification = false;
 
         //for the UI visual
-        Intent iEvent = new Intent("event");
-        iEvent.putExtra("type",alertType);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(iEvent);
+        android.os.Bundle evB = new android.os.Bundle();
+        evB.putInt("type", alertType);
+        org.havenapp.main.HavenEventBus.post("event", evB);
 
         // FIX: Don't return early for empty values - create the event anyway
         // if (TextUtils.isEmpty(value))

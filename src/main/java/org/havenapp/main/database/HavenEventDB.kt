@@ -2,7 +2,6 @@ package org.havenapp.main.database
 
 import android.content.Context
 import android.content.Intent
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -36,10 +35,8 @@ abstract class HavenEventDB : RoomDatabase() {
                     if (INSTANCE == null) {
 
                         // notify interested components that db initialization is starting
-                        var dbIntent = Intent()
-                        dbIntent.putExtra(DB_INIT_STATUS, DB_INIT_START)
-                        dbIntent.action = DB_INIT_STATUS
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(dbIntent)
+                        org.havenapp.main.HavenEventBus.post(DB_INIT_STATUS,
+                            android.os.Bundle().apply { putInt(DB_INIT_STATUS, DB_INIT_START) })
 
                         val builder = Room.databaseBuilder(context.applicationContext,
                                 HavenEventDB::class.java, "haven.db")
@@ -64,10 +61,8 @@ abstract class HavenEventDB : RoomDatabase() {
                         INSTANCE = builder.build()
 
                         // notify interested components that db initialization has succeeded
-                        dbIntent = Intent()
-                        dbIntent.putExtra(DB_INIT_STATUS, DB_INIT_END)
-                        dbIntent.action = DB_INIT_STATUS
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(dbIntent)
+                        org.havenapp.main.HavenEventBus.post(DB_INIT_STATUS,
+                            android.os.Bundle().apply { putInt(DB_INIT_STATUS, DB_INIT_END) })
 
                     }
                 }

@@ -35,7 +35,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import me.angrybyte.numberpicker.listener.OnValueChangeListener;
 import me.angrybyte.numberpicker.view.ActualNumberPicker;
 
@@ -131,10 +130,7 @@ public class CameraConfigureActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("event");
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver,filter );
-
+        org.havenapp.main.HavenEventBus.register(busListener);
     }
 
     @Override
@@ -174,20 +170,17 @@ public class CameraConfigureActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        org.havenapp.main.HavenEventBus.unregister(busListener);
 
     }
 
-    BroadcastReceiver receiver = new BroadcastReceiver() {
+    final org.havenapp.main.HavenEventBus.Listener busListener =
+            new org.havenapp.main.HavenEventBus.Listener() {
         @Override
-        public void onReceive(Context context, Intent intent) {
-
-            int eventType = intent.getIntExtra("type",-1);
-            boolean detected = intent.getBooleanExtra("detected",true);
-            int percChanged = intent.getIntExtra("changed",-1);
-
-            if (percChanged != -1)
-            {
+        public void onHavenEvent(String action, android.os.Bundle extras) {
+            if (!"event".equals(action) || extras == null) return;
+            int percChanged = extras.getInt("changed", -1);
+            if (percChanged != -1) {
                 mTxtStatus.setText(percChanged + "% motion detected");
             }
         }

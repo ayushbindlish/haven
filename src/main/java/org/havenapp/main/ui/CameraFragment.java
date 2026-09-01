@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.camera.view.PreviewView;
 import androidx.fragment.app.Fragment;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.havenapp.main.PreferenceManager;
 import org.havenapp.main.R;
@@ -79,11 +78,11 @@ public final class CameraFragment extends Fragment {
 
     private void onPreviewMotion(int percentChanged) {
         if (isDetached() || getActivity() == null) return;
-        Intent i = new Intent("event");
-        i.putExtra("type", EventTrigger.CAMERA);
-        i.putExtra("detected", percentChanged > 0);
-        i.putExtra("changed", percentChanged);
-        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(i);
+        android.os.Bundle b = new android.os.Bundle();
+        b.putInt("type", EventTrigger.CAMERA);
+        b.putBoolean("detected", percentChanged > 0);
+        b.putInt("changed", percentChanged);
+        org.havenapp.main.HavenEventBus.post("event", b);
     }
 
     @Override
