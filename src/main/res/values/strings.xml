@@ -351,7 +351,7 @@
     <string name="audit_reset">Reset baseline</string>
     <string name="audit_dismiss">OK</string>
     <string name="device_setup_title">Keep Haven running</string>
-    <string name="device_setup_body">Samsung / One UI aggressively stops background apps. For reliable monitoring:\n\n1. Battery optimisation: exempt Haven (%1$s).\n2. Open App info → Battery → set to \"Unrestricted\".\n3. App info → disable \"Pause app activity if unused\".\n4. App info → Permissions → turn off \"Remove permissions if app is unused\".\n5. Settings → Battery → Background usage limits → make sure Haven is NOT in \"Sleeping\" or \"Deep sleeping apps\".\n6. Leave the phone plugged in for long deployments.</string>
+    <string name="device_setup_body">Many phones aggressively stop background apps. For reliable monitoring, apply whichever of these your phone offers:\n\n1. Battery optimisation: exempt Haven (%1$s).\n2. App info → Battery → set to \"Unrestricted\" / \"No restrictions\".\n3. App info → turn off \"Pause app activity if unused\" (Samsung) / \"Remove permissions and free up space\" (Pixel).\n4. App info → Permissions → turn off \"Remove permissions if app is unused\".\n5. Battery → Background usage limits → make sure Haven is NOT listed as \"Sleeping\" / \"Restricted\" (Samsung: \"Sleeping\" / \"Deep sleeping apps\").\n6. Leave the phone plugged in for long deployments.</string>
     <string name="device_setup_battery">Battery settings</string>
     <string name="device_setup_appinfo">App info</string>
 

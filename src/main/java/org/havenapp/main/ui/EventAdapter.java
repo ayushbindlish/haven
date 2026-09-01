@@ -43,7 +43,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventVH> {
 
         Event event = events.get(position);
 
-        String title = event.getStartTime().toLocaleString();
+        String title = org.havenapp.main.Utils.formatDateTime(event.getStartTime());
         String desc = event.getEventTriggerCount() + " " +
                 resourceManager.getString(R.string.detection_events);
 

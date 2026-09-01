@@ -174,7 +174,7 @@ public class WebServer extends NanoHTTPD {
 
         List<EventTrigger> triggers = event.getEventTriggers();
 
-        page.append("<h1>Event: ").append(event.getStartTime().toLocaleString()).append("</h1><hr/>\n");
+        page.append("<h1>Event: ").append(org.havenapp.main.Utils.formatDateTime(event.getStartTime())).append("</h1><hr/>\n");
 
         for (EventTrigger eventTrigger: triggers)
         {
@@ -218,7 +218,7 @@ public class WebServer extends NanoHTTPD {
 
         for (Event event: events)
         {
-            String title = event.getStartTime().toLocaleString();
+            String title = org.havenapp.main.Utils.formatDateTime(event.getStartTime());
             String desc = event.getEventTriggers().size() + " triggered events";
 
             page.append("<b>").append("<a href=\"/event/").append(event.getId()).append("\">");

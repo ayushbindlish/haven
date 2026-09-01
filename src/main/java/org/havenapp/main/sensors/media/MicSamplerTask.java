@@ -10,34 +10,57 @@
 package org.havenapp.main.sensors.media;
 
 
-import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import java.io.IOException;
 
-public class MicSamplerTask extends AsyncTask<Void,Object,Void> {
+/**
+ * Polls {@link AudioCodec} for the current amplitude on a background thread and delivers
+ * each reading to {@link MicListener} on the main thread. Replaces the removed AsyncTask
+ * this used to extend; the public surface ({@code execute} / {@code cancel} / {@code pause}
+ * / {@code restart} / {@code isSampling}) is unchanged so callers didn't have to move.
+ */
+public class MicSamplerTask {
+
+	private static final Handler MAIN = new Handler(Looper.getMainLooper());
 
 	private MicListener listener = null;
 	private AudioCodec volumeMeter = new AudioCodec();
-	private boolean sampling = true;
-	private boolean paused = false;
+	private volatile boolean sampling = true;
+	private volatile boolean paused = false;
+	private volatile boolean cancelled = false;
+	private Thread thread;
 
 	public  interface MicListener {
 		 void onSignalReceived(short[] signal);
 		 void onMicError();
 	}
-	
+
 	public void setMicListener(MicListener listener) {
 		this.listener = listener;
 	}
-	
-	protected Void onPreExecute(Void...params) {
-		return null;
+
+	public synchronized void execute() {
+		if (thread != null) return;
+		thread = new Thread(this::run, "haven-mic-sampler");
+		thread.start();
 	}
 
-	@Override
-	protected Void doInBackground(Void... params) {
-		
+	/** @param mayInterrupt kept for call-site compatibility with the old AsyncTask.cancel */
+	public void cancel(boolean mayInterrupt) {
+		cancelled = true;
+		Thread t = thread;
+		if (t != null && mayInterrupt) t.interrupt();
+	}
+
+	public boolean isCancelled() {
+		return cancelled;
+	}
+
+	private void run() {
+
 		try {
 			volumeMeter.start();
 		} catch (Exception e) {
@@ -46,21 +69,23 @@ public class MicSamplerTask extends AsyncTask<Void,Object,Void> {
 			if (listener != null) {
 				listener.onMicError();
 			}
-			return null;
+			return;
 		}
-		
+
 		while (true) {
 
 			if (listener != null) {
-				Log.d("MicSamplerTask", "Requesting amplitude");
-				publishProgress(volumeMeter.getAmplitude());
+				final short[] amplitude = volumeMeter.getAmplitude();
+				MAIN.post(() -> {
+					if (!cancelled && listener != null) listener.onSignalReceived(amplitude);
+				});
 			}
 			try {
 				Thread.sleep(250);
-			} catch (InterruptedException e) { 
+			} catch (InterruptedException e) {
 				//Nothing to do we exit next line
 			}
-			
+
 			boolean restartVolumeMeter = false;
 			if (paused) {
 				restartVolumeMeter = true;
@@ -86,26 +111,20 @@ public class MicSamplerTask extends AsyncTask<Void,Object,Void> {
 					Log.d("MicSamplerTask","Failed to start",e);
 				}
 			}
-			if (isCancelled()) { volumeMeter.stop(); sampling = false; return null; }
-		}	
+			if (cancelled) { volumeMeter.stop(); sampling = false; return; }
+		}
 	}
-	
+
 	public boolean isSampling() {
 		return sampling;
 	}
-	
+
 	public void restart() {
 		paused = false;
 		sampling = true;
 	}
-	
+
 	public void pause() {
-		paused = true;		
+		paused = true;
 	}
-	
-	@Override
-    protected void onProgressUpdate(Object... progress) {
-		short[] data = (short[]) progress[0];
-        listener.onSignalReceived(data);
-    }
 }

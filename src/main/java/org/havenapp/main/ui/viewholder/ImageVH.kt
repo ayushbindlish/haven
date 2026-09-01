@@ -26,7 +26,7 @@ class ImageVH(private val resourceManager: IResourceManager,
     fun bind(eventTrigger: EventTrigger, position: Int) {
         indexNumber.text = "#${position + 1}"
         imageTitle.text = eventTrigger.getStringType(resourceManager)
-        imageDesc.text = eventTrigger.time?.toLocaleString() ?: ""
+        imageDesc.text = org.havenapp.main.Utils.formatDateTime(eventTrigger.time)
 
         /**
         Uri fileUri = FileProvider.getUriForFile(

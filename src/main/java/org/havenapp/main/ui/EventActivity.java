@@ -116,7 +116,7 @@ public class EventActivity extends AppCompatActivity implements EventTriggerAdap
      */
     private void onEventFetched(@NonNull Event event) {
         mEvent = event;
-        String title = mEvent.getStartTime().toLocaleString();
+        String title = org.havenapp.main.Utils.formatDateTime(mEvent.getStartTime());
         setTitle(title);
         CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.toolbar_layout);
         collapsingToolbarLayout.setTitle(title);
@@ -185,7 +185,7 @@ public class EventActivity extends AppCompatActivity implements EventTriggerAdap
 
     private void shareEvent ()
     {
-        String title = "Phoneypot: " + mEvent.getStartTime().toLocaleString();
+        String title = "Phoneypot: " + org.havenapp.main.Utils.formatDateTime(mEvent.getStartTime());
 
         //need to "send multiple" to get more than one attachment
         final Intent emailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);

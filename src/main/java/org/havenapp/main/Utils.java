@@ -57,6 +57,16 @@ public class Utils {
     }
 
     /**
+     * Human-readable local date + time. Replaces the deprecated {@link Date#toLocaleString()}.
+     */
+    public static String formatDateTime(Date date) {
+        if (date == null) return "";
+        return java.text.DateFormat.getDateTimeInstance(
+                java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT, Locale.getDefault())
+                .format(date);
+    }
+
+    /**
      * Get the battery level from the device, from official docs:
      * https://developer.android.com/training/monitoring-device-state/battery-monitoring#MonitorLevel
      * @param context

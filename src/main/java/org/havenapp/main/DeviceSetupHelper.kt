@@ -10,11 +10,12 @@ import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 
 /**
- * Samsung One UI (and other aggressive OEM skins) will put a background monitoring app to
- * sleep no matter how correctly the foreground service is implemented. This helper surfaces
- * a short checklist and deep-links the user into the relevant system screens.
+ * Aggressive OEM battery management (Samsung One UI, Xiaomi MIUI, OnePlus, Huawei, ...)
+ * will put a background monitoring app to sleep no matter how correctly the foreground
+ * service is implemented. This helper surfaces a short checklist and deep-links the user
+ * into the relevant system screens; the intents it fires are all standard AOSP actions.
  *
- * See https://dontkillmyapp.com/samsung for the underlying behaviour.
+ * See https://dontkillmyapp.com for the per-vendor behaviour.
  */
 object DeviceSetupHelper {
 

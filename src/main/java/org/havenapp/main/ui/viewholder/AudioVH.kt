@@ -31,7 +31,7 @@ class AudioVH(private val resourceManager: IResourceManager, viewGroup: ViewGrou
     fun bind(eventTrigger: EventTrigger, context: Context, position: Int) {
         indexNumber.text = "#${position + 1}"
         audioTitle.text = eventTrigger.getStringType(resourceManager)
-        audioDesc.text = eventTrigger.time?.toLocaleString() ?: ""
+        audioDesc.text = org.havenapp.main.Utils.formatDateTime(eventTrigger.time)
 
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 

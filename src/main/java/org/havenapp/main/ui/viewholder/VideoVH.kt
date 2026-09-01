@@ -3,8 +3,11 @@ package org.havenapp.main.ui.viewholder
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.media.ThumbnailUtils
+import android.os.Build
 import android.provider.MediaStore
+import android.util.Size
 import android.view.LayoutInflater
+import java.io.File
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.VideoView
@@ -29,14 +32,22 @@ class VideoVH(private val clickListener: VideoClickListener, private val context
     fun bind(eventTrigger: EventTrigger, position: Int) {
         indexNumber.text = "#${position + 1}"
         title.text = eventTrigger.getStringType(resourceManager)
-        desc.text = eventTrigger.time?.toLocaleString() ?: ""
+        desc.text = org.havenapp.main.Utils.formatDateTime(eventTrigger.time)
 
         val vpath = org.havenapp.main.security.MediaAccess
             .resolveForViewing(context, eventTrigger.path.toString())
-        val bitmapD = BitmapDrawable(context.resources,
-            ThumbnailUtils.createVideoThumbnail(vpath,
-                MediaStore.Video.Thumbnails.FULL_SCREEN_KIND))
-        videoView.background = bitmapD
+        val thumb = try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ThumbnailUtils.createVideoThumbnail(File(vpath), Size(1280, 720), null)
+            } else {
+                @Suppress("DEPRECATION")
+                ThumbnailUtils.createVideoThumbnail(vpath,
+                    MediaStore.Video.Thumbnails.FULL_SCREEN_KIND)
+            }
+        } catch (e: Exception) {
+            null
+        }
+        if (thumb != null) videoView.background = BitmapDrawable(context.resources, thumb)
         videoView.setOnClickListener {
             clickListener.onVideoClick(eventTrigger)
         }
