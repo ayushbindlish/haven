@@ -16,7 +16,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import nl.changer.audiowife.AudioWife;
+import org.havenapp.main.ui.AudioMiniPlayer;
 
 /**
  * Created by n8fr8 on 4/16/17.
@@ -106,7 +106,7 @@ public class EventTriggerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
 
-        AudioWife.getInstance().release();
+        AudioMiniPlayer.releaseAll();
     }
 
     @Override

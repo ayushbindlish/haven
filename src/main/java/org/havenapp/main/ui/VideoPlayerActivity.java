@@ -5,20 +5,21 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.ui.StyledPlayerView;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.Player;
+import androidx.media3.ui.PlayerView;
 
 import org.havenapp.main.R;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+@androidx.media3.common.util.UnstableApi
 public class VideoPlayerActivity extends AppCompatActivity implements Player.Listener {
 
     private ExoPlayer player;
-    private StyledPlayerView playerView;
+    private PlayerView playerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,7 +136,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements Player.Lis
     }
 
     @Override
-    public void onPlayerError(com.google.android.exoplayer2.PlaybackException error) {
+    public void onPlayerError(androidx.media3.common.PlaybackException error) {
         onError(error);
     }
 

@@ -1,15 +1,12 @@
 package org.havenapp.main.ui.viewholder
 
 import android.content.Context
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.github.derlio.waveform.SimpleWaveformView
 import com.github.derlio.waveform.soundfile.SoundFile
-import nl.changer.audiowife.AudioWife
 import org.havenapp.main.R
 import org.havenapp.main.model.EventTrigger
 import org.havenapp.main.resources.IResourceManager
@@ -26,14 +23,12 @@ class AudioVH(private val resourceManager: IResourceManager, viewGroup: ViewGrou
     private val audioTitle = itemView.findViewById<TextView>(R.id.title)
     private val audioDesc = itemView.findViewById<TextView>(R.id.item_audio_desc)
     private val waveFormView = itemView.findViewById<SimpleWaveformView>(R.id.item_sound)
-    private val playerContainer = itemView.findViewById<LinearLayout>(R.id.item_player_container)
+    private var player: org.havenapp.main.ui.AudioMiniPlayer? = null
 
     fun bind(eventTrigger: EventTrigger, context: Context, position: Int) {
         indexNumber.text = "#${position + 1}"
         audioTitle.text = eventTrigger.getStringType(resourceManager)
         audioDesc.text = org.havenapp.main.Utils.formatDateTime(eventTrigger.time)
-
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
         val fileSound = File(org.havenapp.main.security.MediaAccess
             .resolveForViewing(context, eventTrigger.path))
@@ -57,8 +52,7 @@ class AudioVH(private val resourceManager: IResourceManager, viewGroup: ViewGrou
             e.printStackTrace()
         }
 
-        playerContainer.removeAllViews()
-
-        AudioWife().init(context, Uri.fromFile(fileSound)).useDefaultUi(playerContainer, inflater)
+        player?.release()
+        player = org.havenapp.main.ui.AudioMiniPlayer.bind(itemView, fileSound)
     }
 }

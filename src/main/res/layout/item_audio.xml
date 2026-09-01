@@ -30,9 +30,33 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="center_vertical"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:paddingLeft="4dp"
-            android:paddingRight="4dp" />
+            android:paddingRight="4dp">
+
+            <ImageButton
+                android:id="@+id/aw_play"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/action_play"
+                android:src="@android:drawable/ic_media_play" />
+
+            <SeekBar
+                android:id="@+id/aw_seek"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/aw_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:paddingEnd="2dp"
+                android:text="00:00 / 00:00"
+                android:textSize="12sp" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/item_audio_desc"
