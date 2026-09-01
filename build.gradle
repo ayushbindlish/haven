@@ -69,6 +69,9 @@ android {
             // tor-android 0.4.9.5 asks for kotlin-stdlib 2.3.0; hold it at our compiler's
             // version so a 2.1 kotlinc doesn't choke on newer stdlib metadata.
             force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+            // gson arrives only transitively; hold it at a version without the known
+            // 2.10.x deserialization DoS rather than declaring a dep we don't use.
+            force 'com.google.code.gson:gson:2.13.1'
         }
     }
 
@@ -180,7 +183,6 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.annotation:annotation:1.9.1'
     implementation 'com.google.android.material:material:1.12.0'
-    implementation 'com.google.code.gson:gson:2.13.1'
     implementation 'com.wdullaer:materialdatetimepicker:4.2.3'
 
     implementation 'net.the4thdimension:audio-wife:1.0.3'
@@ -198,7 +200,6 @@ dependencies {
     implementation 'com.mikepenz:aboutlibraries:7.0.3'
 
     implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
-    implementation 'com.github.ybq:Android-SpinKit:1.4.0'
 
     // Match Kotlin version
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
