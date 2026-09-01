@@ -163,8 +163,8 @@ dependencies {
     // Optional built-in Tor (SOCKS proxy) so Orbot isn't required. Bundles the native
     // tor binary per ABI (~7-8 MB each), Java-21 bytecode, 16 KB-page aligned .so files.
     // On compileSdk 36 we can now go up to 0.4.9.6 (minCompileSdk 36); 0.4.9.6.2+ want
-    // compileSdk 37. 0.4.9.5 (minCompileSdk 1) is fine and already 16 KB-aligned.
-    implementation 'info.guardianproject:tor-android:0.4.9.5'
+    // compileSdk 37. Using 0.4.9.6 now.
+    implementation 'info.guardianproject:tor-android:0.4.9.6'
     implementation 'info.guardianproject:jtorctl:0.4.5.7'
     // Encrypted event database
     implementation 'net.zetetic:sqlcipher-android:4.6.1'
