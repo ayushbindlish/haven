@@ -60,6 +60,7 @@ public final class TorController {
     public static synchronized void start(Context context) {
         Context app = context.getApplicationContext();
         if (bound) return;
+        if (!new PreferenceManager(app).getEmbeddedTorEnabled()) return;
 
         if (statusReceiver == null) {
             statusReceiver = new BroadcastReceiver() {
@@ -102,9 +103,19 @@ public final class TorController {
         } catch (Exception e) {
             Log.e(TAG, "start failed", e);
         }
+        if (!bound) {
+            // don't leak the receiver if the bind never took
+            connection = null;
+            try {
+                app.unregisterReceiver(statusReceiver);
+            } catch (Exception ignored) {
+            }
+            statusReceiver = null;
+        }
     }
 
     public static synchronized void stop(Context context) {
+        if (!bound && connection == null && statusReceiver == null) return; // nothing to do
         Context app = context.getApplicationContext();
         if (bound && connection != null) {
             try {
@@ -126,11 +137,18 @@ public final class TorController {
         Log.i(TAG, "embedded Tor stopped");
     }
 
-    /** Start embedded Tor if the toggle is on and something needs Tor; stop it otherwise. */
+    /**
+     * Start embedded Tor only when something actually needs it right now — alerts routed
+     * over Tor while monitoring is armed, or the onion remote-access server running — and
+     * stop it otherwise. Called from app start, the relevant Settings toggles, and when
+     * the monitor service arms / disarms, so a bootstrap doesn't fire on every unrelated
+     * background wake-up.
+     */
     public static void reconcile(Context context) {
         PreferenceManager p = new PreferenceManager(context);
         boolean want = p.getEmbeddedTorEnabled()
-                && (p.getAlertsViaTor() || p.getRemoteAccessActive());
+                && ((p.getAlertsViaTor() && p.getMonitorServiceActive())
+                    || p.getRemoteAccessActive());
         if (want) {
             start(context);
         } else {

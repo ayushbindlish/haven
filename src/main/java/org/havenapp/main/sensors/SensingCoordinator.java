@@ -55,7 +55,11 @@ public class SensingCoordinator implements SensorTriggerSink {
     private MicrophoneMonitor mic;
     private CameraMonitor cam;
 
-    private final Runnable lingerDown = this::enterIdle;
+    // Runs on the main thread from handler.postDelayed. Every other state transition holds
+    // the monitor; this one must too, or it races onSensorTrigger() coming off the mic thread.
+    private final Runnable lingerDown = () -> {
+        synchronized (SensingCoordinator.this) { enterIdle(); }
+    };
     private final PowerManager powerManager;
     private PowerManager.OnThermalStatusChangedListener thermalListener;
 

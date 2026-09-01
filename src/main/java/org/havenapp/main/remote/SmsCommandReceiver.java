@@ -4,11 +4,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Telephony;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 
 import org.havenapp.main.PreferenceManager;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Receives SMS and runs any that start with the configured secret through
@@ -31,19 +35,32 @@ public class SmsCommandReceiver extends BroadcastReceiver {
             from = m.getOriginatingAddress();
         }
         final String sender = from;
-        RemoteCommandHandler.handle(context.getApplicationContext(), body.toString(), reply -> {
-            if (sender == null) return;
+        final Context app = context.getApplicationContext();
+        // A command reply can be async (LOCATE waits on a fix), so keep the receiver alive
+        // with goAsync() and only finish() once the reply is sent — or after a safety timeout.
+        final PendingResult pending = goAsync();
+        final AtomicBoolean done = new AtomicBoolean(false);
+        final Runnable finish = () -> { if (done.compareAndSet(false, true)) pending.finish(); };
+        final Handler main = new Handler(Looper.getMainLooper());
+        main.postDelayed(finish, 45_000L);
+
+        boolean handled = RemoteCommandHandler.handle(app, body.toString(), reply -> {
             try {
-                SmsManager sm = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-                        ? context.getSystemService(SmsManager.class)
-                        : SmsManager.getDefault();
-                if (sm != null) {
-                    for (String part : sm.divideMessage(reply)) {
-                        sm.sendTextMessage(sender, null, part, null, null);
+                if (sender != null) {
+                    SmsManager sm = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                            ? app.getSystemService(SmsManager.class)
+                            : SmsManager.getDefault();
+                    if (sm != null) {
+                        for (String part : sm.divideMessage(reply)) {
+                            sm.sendTextMessage(sender, null, part, null, null);
+                        }
                     }
                 }
             } catch (Exception ignored) {
+            } finally {
+                main.postDelayed(finish, 4_000L); // let a WIPE/late reply drain first
             }
         });
+        if (!handled) finish.run();
     }
 }

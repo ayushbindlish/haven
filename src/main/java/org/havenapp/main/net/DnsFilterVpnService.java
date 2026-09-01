@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
@@ -49,8 +50,14 @@ public class DnsFilterVpnService extends VpnService {
             stopSelf();
             return START_NOT_STICKY;
         }
+        // Establish the tunnel FIRST: an active VPN waives the Android 14+ requirement that
+        // startForeground() name a foregroundServiceType. Calling startForeground() before
+        // establish() throws MissingForegroundServiceTypeException.
+        if (!startTunnel()) {
+            stopSelf();
+            return START_NOT_STICKY;
+        }
         startForegroundNotice();
-        startTunnel();
         return START_STICKY;
     }
 
@@ -62,8 +69,9 @@ public class DnsFilterVpnService extends VpnService {
         super.onDestroy();
     }
 
-    private void startTunnel() {
-        if (running) return;
+    /** @return true if the tunnel is up (or already was); false if it couldn't be established. */
+    private boolean startTunnel() {
+        if (running) return true;
         try {
             Builder b = new Builder()
                     .setSession("Haven filter")
@@ -76,16 +84,17 @@ public class DnsFilterVpnService extends VpnService {
             }
             tun = b.establish();
             if (tun == null) {
-                stopSelf();
-                return;
+                Log.w(TAG, "establish() returned null (no VPN consent?)");
+                return false;
             }
             running = true;
             worker = new Thread(this::loop, "haven-dns-filter");
             worker.start();
             Log.i(TAG, "DNS filter tunnel up");
+            return true;
         } catch (Exception e) {
             Log.e(TAG, "establish failed", e);
-            stopSelf();
+            return false;
         }
     }
 
@@ -122,6 +131,7 @@ public class DnsFilterVpnService extends VpnService {
         int ipVer = (pkt[0] & 0xF0) >> 4;
         if (ipVer != 4) return;
         int ihl = (pkt[0] & 0x0F) * 4;
+        if (ihl < 20 || ihl + 8 > len) return;   // truncated / bogus header -> ignore
         int proto = pkt[9] & 0xFF;
         if (proto != 17) return; // UDP only
 
@@ -153,12 +163,21 @@ public class DnsFilterVpnService extends VpnService {
         try {
             InetAddress up = InetAddress.getByName(UPSTREAM);
             sock.send(new DatagramPacket(dns, dns.length, up, 53));
+            // The socket is shared and serial; a delayed reply to an earlier query can
+            // arrive here. Only accept a datagram whose DNS transaction id matches ours,
+            // otherwise the caller would get an answer for the wrong question.
+            long deadline = System.currentTimeMillis() + 5000;
             byte[] r = new byte[1500];
-            DatagramPacket dp = new DatagramPacket(r, r.length);
-            sock.receive(dp);
-            byte[] o = new byte[dp.getLength()];
-            System.arraycopy(r, 0, o, 0, dp.getLength());
-            return o;
+            while (System.currentTimeMillis() < deadline) {
+                DatagramPacket dp = new DatagramPacket(r, r.length);
+                sock.receive(dp);
+                if (dp.getLength() >= 2 && r[0] == dns[0] && r[1] == dns[1]) {
+                    byte[] o = new byte[dp.getLength()];
+                    System.arraycopy(r, 0, o, 0, dp.getLength());
+                    return o;
+                }
+            }
+            return null;
         } catch (Exception e) {
             return null;
         }
@@ -250,7 +269,19 @@ public class DnsFilterVpnService extends VpnService {
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setOngoing(true)
                 .build();
-        startForeground(7, n);
+        // Android 14+ requires an explicit FGS type. No public type covers a DNS VPN, so
+        // this uses "specialUse" (declared in the manifest with a justification property).
+        // Wrapped defensively: if the platform still refuses, the service keeps running as
+        // the framework-bound VpnService and filtering continues.
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                startForeground(7, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+            } else {
+                startForeground(7, n);
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "startForeground refused; continuing as bound VpnService", e);
+        }
     }
 
     private void closeQuietly() {

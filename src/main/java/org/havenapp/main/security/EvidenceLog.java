@@ -1,12 +1,14 @@
 package org.havenapp.main.security;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,10 @@ import java.util.List;
 public final class EvidenceLog {
 
     private static final String FILE = "evidence.log";
+    private static final String TAG = "EvidenceLog";
+
+    /** Cache of the last line's chain hash so append() doesn't re-read the whole log. */
+    private static String cachedChain = null;
 
     private EvidenceLog() {}
 
@@ -30,23 +36,30 @@ public final class EvidenceLog {
     public static synchronized void append(Context context, int type, String path) {
         try {
             File f = file(context);
-            String prevChain = lastChain(f);
+            String prevChain = cachedChain != null ? cachedChain : lastChain(f);
             String fileHash = "";
             if (path != null && new File(path).isFile()) {
                 fileHash = sha256Plain(context, path);
             }
+            // The record is one physical line with '|' field separators, so the free-text
+            // path/value must not contain '|' or a line break or it corrupts the chain.
+            String safePath = path == null ? "" : path.replaceAll("[\\r\\n|]+", " ").trim();
             String core = System.currentTimeMillis() + "|" + type + "|"
-                    + (path == null ? "" : path) + "|" + fileHash;
+                    + safePath + "|" + fileHash;
             String chain = sha256(prevChain + core);
             try (FileWriter w = new FileWriter(f, true)) {
                 w.append(core).append('|').append(chain).append('\n');
             }
-        } catch (Exception ignored) {
+            cachedChain = chain;
+        } catch (Exception e) {
+            cachedChain = null; // force a re-read next time
+            Log.w(TAG, "could not append to evidence log", e);
         }
     }
 
     /** @return list of problems; empty means the chain is intact. */
     public static synchronized List<String> verify(Context context) {
+        cachedChain = null; // re-read the tail after a verify
         List<String> problems = new ArrayList<>();
         File f = file(context);
         if (!f.exists()) {
@@ -86,14 +99,34 @@ public final class EvidenceLog {
     }
 
     private static String lastChain(File f) throws Exception {
-        if (!f.exists()) return "";
-        String last = "";
-        try (BufferedReader r = new BufferedReader(new FileReader(f))) {
-            String line;
-            while ((line = r.readLine()) != null) if (!line.isEmpty()) last = line;
+        if (!f.exists() || f.length() == 0) return "";
+        // Seek from the end and read back to the previous newline instead of scanning
+        // the whole file (which grows without bound on a long-running guard device).
+        try (RandomAccessFile raf = new RandomAccessFile(f, "r")) {
+            long len = raf.length();
+            long pos = len - 1;
+            // skip trailing newlines
+            while (pos >= 0) {
+                raf.seek(pos);
+                int c = raf.read();
+                if (c != '\n' && c != '\r') break;
+                pos--;
+            }
+            long end = pos + 1;
+            while (pos >= 0) {
+                raf.seek(pos);
+                int c = raf.read();
+                if (c == '\n' || c == '\r') break;
+                pos--;
+            }
+            long start = pos + 1;
+            byte[] buf = new byte[(int) (end - start)];
+            raf.seek(start);
+            raf.readFully(buf);
+            String last = new String(buf, "UTF-8");
+            int p = last.lastIndexOf('|');
+            return p < 0 ? "" : last.substring(p + 1);
         }
-        int p = last.lastIndexOf('|');
-        return p < 0 ? "" : last.substring(p + 1);
     }
 
     private static String sha256(String s) throws Exception {

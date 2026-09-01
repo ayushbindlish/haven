@@ -323,6 +323,9 @@ public class MonitorService extends LifecycleService implements SensorTriggerSin
 
         mPrefs.activateMonitorService(true);
 
+        // bring up embedded Tor now if alerts are routed through it
+        org.havenapp.main.net.TorController.reconcile(this);
+
         mPowerReceiver = new PowerConnectionReceiver();
         // register our power status receivers (single filter, both actions)
         IntentFilter powerFilter = new IntentFilter();
@@ -349,6 +352,8 @@ public class MonitorService extends LifecycleService implements SensorTriggerSin
         if (mPrefs.getMonitorServiceActive()) {
             mPrefs.activateMonitorService(false);
         }
+        // tear down embedded Tor unless the onion server still needs it
+        org.havenapp.main.net.TorController.reconcile(this);
         WatchdogWorker.stop(this);
 
         if (mPowerReceiver != null) {
