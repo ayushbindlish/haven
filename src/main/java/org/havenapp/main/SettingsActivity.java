@@ -20,10 +20,12 @@ package org.havenapp.main;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -34,6 +36,11 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_settings);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(R.string.action_settings);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        org.havenapp.main.Utils.applyBarInsets(toolbar, true, false, true);
         org.havenapp.main.Utils.applyBarInsets(findViewById(R.id.settings_fragment), false, true, true);
 
         if (savedInstanceState == null) {
@@ -56,6 +63,15 @@ public class SettingsActivity extends AppCompatActivity {
                 });
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            getOnBackPressedDispatcher().onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
