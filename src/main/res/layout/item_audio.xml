@@ -18,12 +18,14 @@
         <include
             layout="@layout/item_header" />
 
-        <com.github.derlio.waveform.SimpleWaveformView
+        <com.masoudss.lib.WaveformSeekBar
             android:id="@+id/item_sound"
             android:layout_width="match_parent"
             android:layout_height="144dp"
-            app:indicatorColor="@color/colorPrimaryDark"
-            app:waveformColor="@color/colorAccent" />
+            app:wave_min_height="2dp"
+            app:wave_gap="1dp"
+            app:wave_background_color="@color/colorPrimaryDark"
+            app:wave_progress_color="@color/colorAccent" />
 
         <LinearLayout
             android:id="@+id/item_player_container"

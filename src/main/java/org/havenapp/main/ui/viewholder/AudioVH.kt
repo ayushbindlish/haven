@@ -5,8 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.github.derlio.waveform.SimpleWaveformView
-import com.github.derlio.waveform.soundfile.SoundFile
+import com.masoudss.lib.WaveformSeekBar
 import org.havenapp.main.R
 import org.havenapp.main.model.EventTrigger
 import org.havenapp.main.resources.IResourceManager
@@ -22,7 +21,7 @@ class AudioVH(private val resourceManager: IResourceManager, viewGroup: ViewGrou
     private val indexNumber = itemView.findViewById<TextView>(R.id.index_number)
     private val audioTitle = itemView.findViewById<TextView>(R.id.title)
     private val audioDesc = itemView.findViewById<TextView>(R.id.item_audio_desc)
-    private val waveFormView = itemView.findViewById<SimpleWaveformView>(R.id.item_sound)
+    private val waveFormView = itemView.findViewById<WaveformSeekBar>(R.id.item_sound)
     private var player: org.havenapp.main.ui.AudioMiniPlayer? = null
 
     fun bind(eventTrigger: EventTrigger, context: Context, position: Int) {
@@ -33,21 +32,7 @@ class AudioVH(private val resourceManager: IResourceManager, viewGroup: ViewGrou
         val fileSound = File(org.havenapp.main.security.MediaAccess
             .resolveForViewing(context, eventTrigger.path))
         try {
-            val soundFile = SoundFile.create(fileSound.path, object : SoundFile.ProgressListener {
-                var lastProgress = 0
-
-                override fun reportProgress(fractionComplete: Double): Boolean {
-                    val progress = (fractionComplete * 100).toInt()
-                    if (lastProgress == progress) {
-                        return true
-                    }
-                    lastProgress = progress
-
-                    return true
-                }
-            })
-            waveFormView.setAudioFile(soundFile)
-            waveFormView.invalidate()
+            waveFormView.setSampleFrom(fileSound)
         } catch (e: Exception) {
             e.printStackTrace()
         }
