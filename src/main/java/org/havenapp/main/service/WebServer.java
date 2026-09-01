@@ -94,23 +94,21 @@ public class WebServer extends NanoHTTPD {
 
         if (pathSegs.size() == 4  && pathSegs.get(2).equals("trigger"))
         {
-            //long eventId = Long.parseLong(pathSegs.get(1));
-
-            long eventTriggerId = Long.parseLong(pathSegs.get(3));
-            EventTrigger eventTrigger = HavenEventDB.getDatabase(mContext).getEventTriggerDAO()
-                    .findById(eventTriggerId);
-
             try {
-                File fileMedia = new File(Objects.requireNonNull(eventTrigger.getPath()));
-                FileInputStream fis = new FileInputStream(fileMedia);
-                return newChunkedResponse(Response.Status.OK, getMimeType(eventTrigger), fis);
-
+                long eventTriggerId = Long.parseLong(pathSegs.get(3));
+                EventTrigger eventTrigger = HavenEventDB.getDatabase(mContext).getEventTriggerDAO()
+                        .findById(eventTriggerId);
+                // The path is a DB value (no traversal from the URL); open it through
+                // MediaAccess so an at-rest-encrypted .enc file is decrypted on the way out.
+                java.io.InputStream in = org.havenapp.main.security.MediaAccess.openPlain(
+                        mContext, Objects.requireNonNull(eventTrigger.getPath()));
+                return newChunkedResponse(Response.Status.OK, getMimeType(eventTrigger), in);
             }
-            catch (IOException ioe)
-            {
-                Log.e(TAG,"unable to return media file",ioe);
-            } catch (NullPointerException npe) {
-                Log.e(TAG,"unable to return media file", npe);
+            catch (NumberFormatException nfe) {
+                return newFixedLengthResponse(Response.Status.BAD_REQUEST, "text/plain", "bad id");
+            }
+            catch (Exception e) {
+                Log.e(TAG,"unable to return media file", e);
             }
         }
         else if (uri.getPath().startsWith("/feed"))
@@ -265,7 +263,7 @@ public class WebServer extends NanoHTTPD {
         }
 
         public String getHTTPHeader() {
-           return super.getHTTPHeader() + "; path=/";
+           return super.getHTTPHeader() + "; path=/; HttpOnly; SameSite=Strict";
         }
     }
 

@@ -89,6 +89,8 @@ public class HavenApp extends MultiDexApplication {
         org.havenapp.main.service.SupervisorWorker.reschedule(this);
         // Bring up built-in Tor if it's enabled and something routes through it.
         org.havenapp.main.net.TorController.reconcile(this);
+        // Retry any alerts that failed to send before the process last died.
+        new org.havenapp.main.alerts.AlertManager(this).flushPending();
     }
 
 

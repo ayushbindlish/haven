@@ -55,6 +55,7 @@ class HousekeepingWorker(
         try {
             val prefs = PreferenceManager(ctx)
             val alerts = AlertManager(ctx)
+            alerts.flushPending()
 
             if (prefs.securityAuditEnabled) {
                 val changes = IntegrityAuditor(ctx).auditAgainstBaseline()

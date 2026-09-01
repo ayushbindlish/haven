@@ -78,7 +78,38 @@ public class AlertManager {
                         + " failed: " + e.getMessage());
             }
         }
-        Log.e(TAG, "Giving up on " + channel.getChannelName() + " after " + MAX_ATTEMPTS + " attempts");
+        Log.e(TAG, "Giving up on " + channel.getChannelName() + " after " + MAX_ATTEMPTS
+                + " attempts — queued for later");
+        PendingAlertStore.add(context, channel.getChannelName(), message, mediaPath, eventType);
+    }
+
+    /**
+     * Re-attempt every alert that previously exhausted its retries. Call from app start
+     * and the housekeeping tick. Expired entries are dropped by {@link PendingAlertStore}.
+     */
+    public void flushPending() {
+        executor.execute(() -> {
+            java.util.List<PendingAlertStore.Pending> pending = PendingAlertStore.load(context);
+            if (pending.isEmpty()) return;
+            java.util.List<PendingAlertStore.Pending> stillFailing = new ArrayList<>();
+            for (PendingAlertStore.Pending p : pending) {
+                AlertChannel channel = null;
+                for (AlertChannel c : channels) {
+                    if (c.getChannelName().equals(p.channel)) { channel = c; break; }
+                }
+                if (channel == null || !channel.isEnabled() || !channel.isAvailable()) {
+                    stillFailing.add(p); // channel not usable right now; keep for next time
+                    continue;
+                }
+                try {
+                    channel.sendAlert(p.message, p.mediaPath, p.eventType);
+                    Log.d(TAG, "flushed queued alert via " + p.channel);
+                } catch (Exception e) {
+                    stillFailing.add(p);
+                }
+            }
+            PendingAlertStore.save(context, stillFailing);
+        });
     }
 
     /** Fire a test alert through every currently enabled + available channel. */
