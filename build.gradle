@@ -3,6 +3,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        gradlePluginPortal()
         maven { url = 'https://jitpack.io' }
         maven { url = 'https://repo1.maven.org/maven2' }
         maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
@@ -10,6 +11,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:8.11.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.mikepenz.aboutlibraries.plugin:aboutlibraries-plugin:12.2.4"
     }
 }
 
@@ -24,6 +26,7 @@ def getVersionName = { ->
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.mikepenz.aboutlibraries.plugin'
 
 allprojects {
     repositories {
@@ -191,7 +194,7 @@ dependencies {
     implementation 'com.github.stfalcon-studio:StfalconImageViewer:1.0.1'
     implementation 'com.github.massoudss:waveformSeekBar:5.0.2'
     implementation 'com.googlecode.libphonenumber:libphonenumber:9.0.11'
-    implementation 'com.mikepenz:aboutlibraries:7.0.3'
+    implementation 'com.mikepenz:aboutlibraries:12.2.4'
 
     // Media3 (ExoPlayer's successor; the old com.google.android.exoplayer:2.x is EOL)
     implementation 'androidx.media3:media3-exoplayer:1.4.1'

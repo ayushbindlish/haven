@@ -47,7 +47,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.mikepenz.aboutlibraries.Libs;
 import com.mikepenz.aboutlibraries.LibsBuilder;
 
 import org.havenapp.main.database.HavenEventDB;
@@ -441,12 +440,11 @@ public class ListActivity extends AppCompatActivity {
     private void showLicenses ()
     {
         new LibsBuilder()
-                //provide a style (optional) (LIGHT, DARK, LIGHT_DARK_TOOLBAR)
-                .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
+                .withActivityTitle(resourceManager.getString(R.string.menu_licenses))
                 .withAboutIconShown(true)
                 .withAboutVersionShown(true)
                 .withAboutAppName(resourceManager.getString(R.string.app_name))
-                                //start the activity
+                .withEdgeToEdge(true)
                 .start(this);
     }
 
