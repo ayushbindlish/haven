@@ -132,7 +132,7 @@ public class AccelConfigureActivity extends AppCompatActivity implements SensorE
 
     @Override
     public boolean onSupportNavigateUp() {
-        onBackPressed();
+        getOnBackPressedDispatcher().onBackPressed();
         return true;
     }
 
@@ -268,12 +268,4 @@ public class AccelConfigureActivity extends AppCompatActivity implements SensorE
         return true;
     }
 
-    /**
-     * When user closes the activity
-     */
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
-    }
 }

@@ -44,6 +44,16 @@ public class SettingsActivity extends AppCompatActivity {
             mFragment = (SettingsFragment) getSupportFragmentManager().findFragmentById(R.id.settings_fragment);
         }
 
+        getOnBackPressedDispatcher().addCallback(this,
+                new androidx.activity.OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        if (mFragment != null) mFragment.save();
+                        setEnabled(false);
+                        getOnBackPressedDispatcher().onBackPressed();
+                    }
+                });
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
@@ -57,8 +67,4 @@ public class SettingsActivity extends AppCompatActivity {
         mFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    @Override
-    public void onBackPressed() {
-       mFragment.save();
-    }
 }

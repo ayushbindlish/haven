@@ -65,6 +65,14 @@ public class CameraConfigureActivity extends AppCompatActivity {
     private void initLayout() {
         mPrefManager = new PreferenceManager(getApplicationContext());
         setContentView(R.layout.activity_camera_configure);
+        getOnBackPressedDispatcher().addCallback(this,
+                new androidx.activity.OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        mFragment.stopCamera();
+                        finish();
+                    }
+                });
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -119,14 +127,6 @@ public class CameraConfigureActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * When user closes the activity
-     */
-    @Override
-    public void onBackPressed() {
-        mFragment.stopCamera();
-        finish();
-    }
 
     @Override
     public void onResume() {

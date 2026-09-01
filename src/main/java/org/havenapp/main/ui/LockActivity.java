@@ -44,6 +44,14 @@ public class LockActivity extends AppCompatActivity {
         }
 
         setContentView(buildUi());
+        getOnBackPressedDispatcher().addCallback(this,
+                new androidx.activity.OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        // Can't back out of the lock; drop to the launcher instead.
+                        moveTaskToBack(true);
+                    }
+                });
         maybePromptBiometric();
     }
 
@@ -134,9 +142,4 @@ public class LockActivity extends AppCompatActivity {
         org.havenapp.main.security.MediaAccess.clearViewCache(this);
     }
 
-    @Override
-    public void onBackPressed() {
-        // Can't back out of the lock; drop to the launcher instead.
-        moveTaskToBack(true);
-    }
 }

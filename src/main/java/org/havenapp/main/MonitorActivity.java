@@ -198,6 +198,17 @@ public class MonitorActivity extends AppCompatActivity implements TimePickerDial
     }
     private void initSetupLayout() {
         setContentView(R.layout.activity_monitor);
+        getOnBackPressedDispatcher().addCallback(this,
+                new androidx.activity.OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        if (mIsMonitoring) {
+                            moveTaskToBack(true);
+                        } else {
+                            finish();
+                        }
+                    }
+                });
 
         // Blank button
         btnBlankScreen = findViewById(R.id.btnBlankScreen);
@@ -473,14 +484,6 @@ public class MonitorActivity extends AppCompatActivity implements TimePickerDial
      * (foreground, camera + sensors), so just drop to the background rather than tearing
      * the Activity down abruptly.
      */
-    @Override
-    public void onBackPressed() {
-        if (mIsMonitoring) {
-            moveTaskToBack(true);
-        } else {
-            finish();
-        }
-    }
 
     private void showTimeDelayDialog() {
         int totalSecs = preferences.getTimerDelay();

@@ -227,11 +227,4 @@ public class MicrophoneConfigureActivity extends AppCompatActivity implements Mi
         return true;
     }
 
-    /**
-     * When user closes the activity
-     */
-    @Override
-    public void onBackPressed() {
-        finish();
-    }
 }
