@@ -17,7 +17,7 @@
         <include
             layout="@layout/item_header" />
 
-        <com.facebook.drawee.view.SimpleDraweeView
+        <ImageView
             android:id="@+id/item_camera_image"
             android:layout_width="match_parent"
             android:layout_height="200dp"

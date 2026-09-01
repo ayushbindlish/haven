@@ -1,11 +1,12 @@
 package org.havenapp.main.ui.viewholder
 
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.drawee.view.SimpleDraweeView
+import com.bumptech.glide.Glide
+import java.io.File
 import org.havenapp.main.R
 import org.havenapp.main.model.EventTrigger
 import org.havenapp.main.resources.IResourceManager
@@ -21,7 +22,7 @@ class ImageVH(private val resourceManager: IResourceManager,
     private val indexNumber = itemView.findViewById<TextView>(R.id.index_number)
     private val imageTitle = itemView.findViewById<TextView>(R.id.title)
     private val imageDesc = itemView.findViewById<TextView>(R.id.item_camera_desc)
-    private val imageView = itemView.findViewById<SimpleDraweeView>(R.id.item_camera_image)
+    private val imageView = itemView.findViewById<ImageView>(R.id.item_camera_image)
 
     fun bind(eventTrigger: EventTrigger, position: Int) {
         indexNumber.text = "#${position + 1}"
@@ -38,7 +39,10 @@ class ImageVH(private val resourceManager: IResourceManager,
 
         val viewPath = org.havenapp.main.security.MediaAccess
             .resolveForViewing(itemView.context, eventTrigger.path!!)
-        imageView.setImageURI(Uri.parse("file://$viewPath"))
+        Glide.with(itemView.context)
+            .load(File(viewPath))
+            .centerCrop()
+            .into(imageView)
 
 
         imageView.setOnClickListener {
