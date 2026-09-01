@@ -212,6 +212,20 @@ public class PreferenceManager {
         prefsEditor.commit();
     }
 
+    /**
+     * Run a Tor client inside the app instead of requiring Orbot. Adds ~15-20 MB of
+     * native code and needs a bootstrap (~10-60 s) before the SOCKS proxy works. When
+     * off, "via Tor" traffic falls back to Orbot on 127.0.0.1:9050.
+     */
+    public boolean getEmbeddedTorEnabled() {
+        return appSharedPrefs.getBoolean("embedded_tor_enabled", false);
+    }
+
+    public void setEmbeddedTorEnabled(boolean enabled) {
+        prefsEditor.putBoolean("embedded_tor_enabled", enabled);
+        prefsEditor.commit();
+    }
+
     // Session preferences
     public String getSessionId() {
         return appSharedPrefs.getString("session_id", "");

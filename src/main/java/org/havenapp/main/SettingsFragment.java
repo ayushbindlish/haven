@@ -467,6 +467,18 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 }
                 break;
             }
+            case "embedded_tor_enabled": {
+                SwitchPreference sw = findPreference("embedded_tor_enabled");
+                if (sw != null && sw.isChecked()) {
+                    android.widget.Toast.makeText(mActivity, R.string.embedded_tor_starting,
+                            android.widget.Toast.LENGTH_LONG).show();
+                }
+                org.havenapp.main.net.TorController.reconcile(mActivity);
+                break;
+            }
+            case "alerts_via_tor":
+                org.havenapp.main.net.TorController.reconcile(mActivity);
+                break;
         }
     }
 

@@ -87,6 +87,8 @@ public class HavenApp extends MultiDexApplication {
         org.havenapp.main.service.DeadmanWorker.reschedule(this);
         org.havenapp.main.service.BackupWorker.reschedule(this);
         org.havenapp.main.service.SupervisorWorker.reschedule(this);
+        // Bring up built-in Tor if it's enabled and something routes through it.
+        org.havenapp.main.net.TorController.reconcile(this);
     }
 
 
@@ -102,6 +104,7 @@ public class HavenApp extends MultiDexApplication {
                 }
             }
         }
+        org.havenapp.main.net.TorController.reconcile(this);
     }
 
     public void stopServer ()
@@ -110,6 +113,7 @@ public class HavenApp extends MultiDexApplication {
         {
             mOnionServer.stop();
         }
+        org.havenapp.main.net.TorController.reconcile(this);
     }
 
     @NonNull

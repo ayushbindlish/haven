@@ -154,6 +154,12 @@ dependencies {
     implementation 'com.google.crypto.tink:tink-android:1.13.0'
     // QR encode/decode for parent<->child pairing (pure-Java, no android deps)
     implementation 'com.google.zxing:core:3.5.3'
+    // Optional built-in Tor (SOCKS proxy) so Orbot isn't required. Bundles the native
+    // tor binary per ABI (~7-8 MB each). Later releases raise the bar: 0.4.9.9+ needs
+    // compileSdk 37 / a newer AGP, and 0.4.8.17+ ship Java 21 bytecode that javac
+    // targeting 17 refuses to read. 0.4.8.16 is the newest that builds here.
+    implementation 'info.guardianproject:tor-android:0.4.8.16'
+    implementation 'info.guardianproject:jtorctl:0.4.5.7'
     // Encrypted event database
     implementation 'net.zetetic:sqlcipher-android:4.6.1'
     implementation 'androidx.sqlite:sqlite:2.4.0'

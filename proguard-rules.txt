@@ -18,6 +18,16 @@
 -keep class fi.iki.elonen.** { *; }
 -dontwarn fi.iki.elonen.**
 
+# --- Embedded Tor (info.guardianproject:tor-android + jtorctl) ---
+# TorService has native methods and is called back from JNI; jtorctl is reflected over.
+-keep class org.torproject.jni.** { *; }
+-keep class net.freehaven.tor.control.** { *; }
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+-dontwarn org.torproject.jni.**
+-dontwarn net.freehaven.tor.control.**
+
 # --- Third-party libs that ship incomplete metadata ---
 -dontwarn com.google.**
 -dontwarn org.slf4j.**

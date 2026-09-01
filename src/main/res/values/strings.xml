@@ -300,8 +300,11 @@
     <string name="ntfy_server_hint">https://ntfy.sh or your self-hosted URL</string>
     <string name="ntfy_topic">ntfy topic</string>
     <string name="ntfy_topic_hint">A hard-to-guess topic name you subscribe to in the ntfy app</string>
-    <string name="alerts_via_tor">Route network alerts via Orbot</string>
-    <string name="alerts_via_tor_hint">Send Telegram / ntfy traffic through Tor (requires Orbot running)</string>
+    <string name="alerts_via_tor">Route network alerts via Tor</string>
+    <string name="alerts_via_tor_hint">Send Telegram / ntfy traffic through Tor (needs Orbot, or turn on built-in Tor below)</string>
+    <string name="embedded_tor_title">Use built-in Tor</string>
+    <string name="embedded_tor_summary">Run Tor inside Haven so Orbot isn\'t needed. Adds ~22 MB and takes up to a minute to connect the first time.</string>
+    <string name="embedded_tor_starting">Starting built-in Tor — the first connection can take up to a minute.</string>
     <string name="mesh_title">Watch my other Haven devices</string>
     <string name="mesh_summary">Devices sharing this ntfy topic check on each other; alert if one goes quiet</string>
     <string name="mesh_name_title">This device\'s name in the mesh</string>

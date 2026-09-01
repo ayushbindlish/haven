@@ -2,6 +2,8 @@ package org.havenapp.main.alerts;
 
 import android.text.TextUtils;
 
+import org.havenapp.main.net.TorController;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -10,7 +12,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -18,15 +19,18 @@ import java.util.Map;
 
 /**
  * Minimal HTTP helper for the network alert channels (Telegram, ntfy). Uses only
- * {@link HttpURLConnection}; when {@code tor} is set, tunnels TCP through Orbot's local
- * SOCKS proxy (127.0.0.1:9050).
+ * {@link HttpURLConnection}; when {@code tor} is set, tunnels TCP through a local SOCKS
+ * proxy — Orbot's (127.0.0.1:9050) or the app's own embedded Tor, whichever is up (see
+ * {@link TorController#socksAddress()}).
  */
 public final class HttpPoster {
 
     private static final int CONNECT_TIMEOUT_MS = 15000;
     private static final int READ_TIMEOUT_MS = 30000;
-    private static final Proxy TOR = new Proxy(Proxy.Type.SOCKS,
-            new InetSocketAddress("127.0.0.1", 9050));
+
+    private static Proxy torProxy() {
+        return new Proxy(Proxy.Type.SOCKS, TorController.socksAddress());
+    }
 
     private HttpPoster() {}
 
@@ -39,7 +43,7 @@ public final class HttpPoster {
 
     private static HttpURLConnection open(String urlStr, boolean tor) throws Exception {
         URL url = new URL(urlStr);
-        HttpURLConnection c = (HttpURLConnection) (tor ? url.openConnection(TOR) : url.openConnection());
+        HttpURLConnection c = (HttpURLConnection) (tor ? url.openConnection(torProxy()) : url.openConnection());
         c.setConnectTimeout(CONNECT_TIMEOUT_MS);
         c.setReadTimeout(READ_TIMEOUT_MS);
         c.setInstanceFollowRedirects(true);
