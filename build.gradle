@@ -66,6 +66,9 @@ android {
         resolutionStrategy {
             force 'androidx.work:work-runtime:2.8.1'
             force 'androidx.work:work-runtime-ktx:2.8.1'  // Update to match work-runtime version
+            // tor-android 0.4.9.5 asks for kotlin-stdlib 2.3.0; hold it at our compiler's
+            // version so a 2.1 kotlinc doesn't choke on newer stdlib metadata.
+            force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
         }
     }
 
@@ -109,14 +112,16 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        // Java 21: info.guardianproject:tor-android 0.4.9.x ships Java-21 bytecode, and it's
+        // the first line that's 16 KB-page aligned. Needs the build to run on JDK 21.
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
         // Enable core library desugaring
         coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
-        jvmTarget = "17"  // Change from "11"
+        jvmTarget = "21"
     }
 
 
@@ -155,10 +160,10 @@ dependencies {
     // QR encode/decode for parent<->child pairing (pure-Java, no android deps)
     implementation 'com.google.zxing:core:3.5.3'
     // Optional built-in Tor (SOCKS proxy) so Orbot isn't required. Bundles the native
-    // tor binary per ABI (~7-8 MB each). Later releases raise the bar: 0.4.9.9+ needs
-    // compileSdk 37 / a newer AGP, and 0.4.8.17+ ship Java 21 bytecode that javac
-    // targeting 17 refuses to read. 0.4.8.16 is the newest that builds here.
-    implementation 'info.guardianproject:tor-android:0.4.8.16'
+    // tor binary per ABI (~7-8 MB each). 0.4.9.5 is the newest release that still builds
+    // on AGP 8.7 / compileSdk 35 (0.4.9.6+ demand compileSdk 36/37); it ships Java-21
+    // bytecode (hence jvmTarget 21 above) and its .so files are 16 KB-page aligned.
+    implementation 'info.guardianproject:tor-android:0.4.9.5'
     implementation 'info.guardianproject:jtorctl:0.4.5.7'
     // Encrypted event database
     implementation 'net.zetetic:sqlcipher-android:4.6.1'
