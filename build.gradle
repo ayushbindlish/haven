@@ -152,6 +152,8 @@ dependencies {
     implementation 'androidx.biometric:biometric:1.1.0'
     // At-rest encryption: Keystore-backed AEAD for media + backups
     implementation 'com.google.crypto.tink:tink-android:1.13.0'
+    // QR encode/decode for parent<->child pairing (pure-Java, no android deps)
+    implementation 'com.google.zxing:core:3.5.3'
     // Encrypted event database
     implementation 'net.zetetic:sqlcipher-android:4.6.1'
     implementation 'androidx.sqlite:sqlite:2.4.0'

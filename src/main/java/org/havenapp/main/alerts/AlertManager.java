@@ -48,6 +48,9 @@ public class AlertManager {
             lastKeyAt = now;
         }
 
+        // Mirror to a paired parent device, if supervised mode is on.
+        org.havenapp.main.pairing.SupervisorBus.publishEvent(context, message);
+
         for (AlertChannel channel : channels) {
             if (channel.isEnabled() && channel.isAvailable()) {
                 executor.execute(() -> deliver(channel, message, mediaPath, eventType));

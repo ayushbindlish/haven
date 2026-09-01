@@ -27,7 +27,7 @@ public final class RemoteCommandHandler {
     /** @return true if the message was a valid, authenticated command (and was handled). */
     public static boolean handle(Context context, String rawMessage, Reply reply) {
         PreferenceManager prefs = new PreferenceManager(context);
-        if (!prefs.getRemoteCommandsEnabled()) return false;
+        if (!prefs.getRemoteCommandsEnabled() && !prefs.getSupervisedEnabled()) return false;
         String secret = prefs.getRemoteCommandSecret();
         if (secret == null || secret.trim().isEmpty()) return false;
 

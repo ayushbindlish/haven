@@ -350,6 +350,23 @@
 
     <PreferenceCategory
         app:iconSpaceReserved="false"
+        android:title="@string/supervised_category">
+
+        <Preference
+            app:iconSpaceReserved="false"
+            android:key="supervised_show_qr"
+            android:title="@string/supervised_show_qr_title"
+            android:summary="@string/supervised_show_qr_summary" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            android:key="supervised_disable"
+            android:title="@string/supervised_disable_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
         android:title="@string/backup_category">
 
         <SwitchPreference

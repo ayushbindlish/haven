@@ -361,6 +361,21 @@ public class PreferenceManager {
         prefsEditor.putLong("clock_ref_wall", wall).putLong("clock_ref_uptime", uptime).commit();
     }
 
+    public boolean getSupervisedEnabled() {
+        return appSharedPrefs.getBoolean("supervised_enabled", false);
+    }
+    public void setSupervisedEnabled(boolean v) { prefsEditor.putBoolean("supervised_enabled", v).commit(); }
+    public String getSupervisedServer() { return appSharedPrefs.getString("supervised_server", "https://ntfy.sh"); }
+    public void setSupervisedServer(String s) { prefsEditor.putString("supervised_server", s).commit(); }
+    public String getSupervisedTopic() { return appSharedPrefs.getString("supervised_topic", ""); }
+    public void setSupervisedTopic(String s) { prefsEditor.putString("supervised_topic", s).commit(); }
+    public void setRemoteCommandSecret(String s) { prefsEditor.putString("remote_command_secret", s).commit(); }
+    public long getSupervisedPollSince() { return appSharedPrefs.getLong("supervised_poll_since", 0L); }
+    public void setSupervisedPollSince(long t) { prefsEditor.putLong("supervised_poll_since", t).commit(); }
+    /** Paired child devices JSON (parent side). */
+    public String getPairedDevices() { return appSharedPrefs.getString("paired_devices", "[]"); }
+    public void setPairedDevices(String json) { prefsEditor.putString("paired_devices", json).commit(); }
+
     public boolean getMeshEnabled() {
         return appSharedPrefs.getBoolean("mesh_enabled", false);
     }

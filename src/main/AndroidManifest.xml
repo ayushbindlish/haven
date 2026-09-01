@@ -111,6 +111,13 @@
             android:screenOrientation="fullUser"
             android:theme="@style/AppTheme" />
 
+        <activity android:name=".pairing.SupervisedSetupActivity"
+            android:exported="false" android:theme="@style/AppTheme" />
+        <activity android:name=".pairing.ParentScanActivity"
+            android:exported="false" android:theme="@style/AppTheme" />
+        <activity android:name=".pairing.ParentDashboardActivity"
+            android:exported="false" android:theme="@style/AppTheme" />
+
         <service
             android:name=".service.MonitorService"
             android:foregroundServiceType="microphone|camera|location"

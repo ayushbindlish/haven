@@ -175,6 +175,20 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return true;
         });
 
+        Preference showQr = findPreference("supervised_show_qr");
+        if (showQr != null) showQr.setOnPreferenceClickListener(p -> {
+            startActivity(new Intent(mActivity, org.havenapp.main.pairing.SupervisedSetupActivity.class));
+            return true;
+        });
+        Preference disSup = findPreference("supervised_disable");
+        if (disSup != null) disSup.setOnPreferenceClickListener(p -> {
+            preferences.setSupervisedEnabled(false);
+            org.havenapp.main.service.SupervisorWorker.reschedule(mActivity);
+            android.widget.Toast.makeText(mActivity, R.string.supervised_off,
+                    android.widget.Toast.LENGTH_SHORT).show();
+            return true;
+        });
+
         Preference backupNow = findPreference("backup_now");
         if (backupNow != null) backupNow.setOnPreferenceClickListener(p -> {
             if (!org.havenapp.main.backup.BackupManager.configured(mActivity)) {

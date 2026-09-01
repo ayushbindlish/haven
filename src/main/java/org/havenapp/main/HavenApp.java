@@ -86,6 +86,7 @@ public class HavenApp extends MultiDexApplication {
         HousekeepingWorker.bootstrap(this); // coalesced audit + usage digest, power-adaptive cadence
         org.havenapp.main.service.DeadmanWorker.reschedule(this);
         org.havenapp.main.service.BackupWorker.reschedule(this);
+        org.havenapp.main.service.SupervisorWorker.reschedule(this);
     }
 
 

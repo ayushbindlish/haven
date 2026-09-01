@@ -355,6 +355,12 @@ public class ListActivity extends AppCompatActivity {
             case R.id.action_verify_evidence:
                 verifyEvidence();
                 break;
+            case R.id.action_parent_mode:
+                startActivity(new Intent(this,
+                        new org.havenapp.main.pairing.PairedStore(this).all().isEmpty()
+                                ? org.havenapp.main.pairing.ParentScanActivity.class
+                                : org.havenapp.main.pairing.ParentDashboardActivity.class));
+                break;
         }
         return true;
     }
