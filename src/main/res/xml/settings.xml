@@ -18,6 +18,14 @@
         android:digits="@string/path_chars"
         />
 
+    <EditTextPreference
+        app:iconSpaceReserved="false"
+        android:dialogLayout="@layout/pref_dialog_edit_text"
+        android:inputType="number"
+        android:key="max_storage_mb_text"
+        android:title="@string/max_storage_title"
+        android:summary="@string/max_storage_summary" />
+
     <Preference
         app:iconSpaceReserved="false"
         android:key="config_battery_optimizations"

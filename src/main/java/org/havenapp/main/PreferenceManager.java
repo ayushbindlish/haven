@@ -360,6 +360,10 @@ public class PreferenceManager {
 
     public int getDeadmanHours() { return appSharedPrefs.getInt("deadman_hours", 0); }
     public void setDeadmanHours(int h) { prefsEditor.putInt("deadman_hours", h).commit(); }
+
+    /** Cap on captured evidence on disk, in MB. 0 = no cap. Oldest events are pruned first. */
+    public int getMaxStorageMb() { return appSharedPrefs.getInt("max_storage_mb", 2048); }
+    public void setMaxStorageMb(int mb) { prefsEditor.putInt("max_storage_mb", Math.max(0, mb)).commit(); }
     public boolean getDeadmanWipe() { return appSharedPrefs.getBoolean("deadman_wipe", false); }
     public long getDeadmanCheckin() { return appSharedPrefs.getLong("deadman_checkin", 0L); }
     public boolean getDeadmanFired() { return appSharedPrefs.getBoolean("deadman_fired", false); }

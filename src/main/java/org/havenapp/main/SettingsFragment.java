@@ -124,6 +124,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             findPreference(PreferenceManager.NOTIFICATION_TIME).setSummary(preferences.getNotificationTimeMs() / 60000 + " " + getString(R.string.minutes));
         }
 
+        EditTextPreference maxStore = findPreference("max_storage_mb_text");
+        if (maxStore != null) maxStore.setText(String.valueOf(preferences.getMaxStorageMb()));
+
         findPreference(PreferenceManager.CAMERA_SENSITIVITY).setOnPreferenceClickListener(preference -> {
             startActivity(new Intent(mActivity, CameraConfigureActivity.class));
             return true;
@@ -410,6 +413,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 try { h = Integer.parseInt(p.getText().trim()); } catch (Exception ignored) {}
                 preferences.setDeadmanHours(Math.max(0, h));
                 org.havenapp.main.service.DeadmanWorker.reschedule(mActivity);
+                break;
+            }
+            case "max_storage_mb_text": {
+                EditTextPreference p = findPreference("max_storage_mb_text");
+                int mb = preferences.getMaxStorageMb();
+                try { mb = Integer.parseInt(p.getText().trim()); } catch (Exception ignored) {}
+                preferences.setMaxStorageMb(Math.max(0, mb));
+                p.setText(String.valueOf(preferences.getMaxStorageMb()));
+                org.havenapp.main.service.RemoveDeletedFilesWorker.runNow(mActivity);
                 break;
             }
             case "remote_commands_enabled": {

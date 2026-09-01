@@ -61,11 +61,55 @@ class RemoveDeletedFilesWorker(
         return try {
             Log.d(TAG, "Starting cleanup. Work id: $id")
             removeDeletedLogsFromDisk()
+            enforceStorageCap()
             Log.d(TAG, "Cleanup complete. Work id: $id")
             Result.success()
         } catch (e: Exception) {
             Log.e(TAG, "Cleanup failed", e)
             Result.retry()
+        }
+    }
+
+    /**
+     * Ring-buffer the evidence directory: while it exceeds [PreferenceManager.getMaxStorageMb],
+     * drop whole events oldest-first (their trigger rows and media files) until it's back
+     * under ~90 % of the cap. 0 MB disables the cap.
+     */
+    private fun enforceStorageCap() {
+        val capMb = PreferenceManager(applicationContext).maxStorageMb
+        if (capMb <= 0) return
+        val capBytes = capMb.toLong() * 1024 * 1024
+        val root = storageRoot() ?: return
+        if (!root.exists()) return
+
+        fun dirSize(): Long = root.walkTopDown().filter { it.isFile }.map { it.length() }.sum()
+
+        var total = dirSize()
+        if (total <= capBytes) return
+        Log.i(TAG, "evidence ${total / 1048576} MB over ${capMb} MB cap — pruning oldest")
+
+        val database = HavenApp.getDataBaseInstance()
+        val target = (capBytes * 9) / 10
+        val oldestFirst = database.getEventDAO().getAllEvent() // ORDER BY ID = chronological
+
+        for (event in oldestFirst) {
+            if (total <= target) break
+            val triggers = database.getEventTriggerDAO().getEventTriggerList(event.id)
+            var freed = 0L
+            for (t in triggers) {
+                val p = t.path ?: continue
+                val f = File(p)
+                if (f.isFile) { freed += f.length(); f.delete() }
+            }
+            if (triggers.isNotEmpty()) database.getEventTriggerDAO().deleteAll(triggers)
+            database.getEventDAO().delete(event)
+            total -= freed
+            Log.i(TAG, "pruned event ${event.id} (${freed / 1024} KB)")
+        }
+
+        // sweep any now-empty session directories
+        root.walkBottomUp().forEach { f ->
+            if (f != root && f.isDirectory && (f.listFiles()?.isEmpty() != false)) f.delete()
         }
     }
 

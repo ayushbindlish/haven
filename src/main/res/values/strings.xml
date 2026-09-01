@@ -350,6 +350,8 @@
     <string name="audit_changes_title">Device changes detected</string>
     <string name="audit_reset">Reset baseline</string>
     <string name="audit_dismiss">OK</string>
+    <string name="max_storage_title">Max evidence storage (MB)</string>
+    <string name="max_storage_summary">When captured photos/video/audio exceed this, the oldest events are deleted automatically. 0 = no limit. Default 2048.</string>
     <string name="device_setup_title">Keep Haven running</string>
     <string name="device_setup_body">Many phones aggressively stop background apps. For reliable monitoring, apply whichever of these your phone offers:\n\n1. Battery optimisation: exempt Haven (%1$s).\n2. App info → Battery → set to \"Unrestricted\" / \"No restrictions\".\n3. App info → turn off \"Pause app activity if unused\" (Samsung) / \"Remove permissions and free up space\" (Pixel).\n4. App info → Permissions → turn off \"Remove permissions if app is unused\".\n5. Battery → Background usage limits → make sure Haven is NOT listed as \"Sleeping\" / \"Restricted\" (Samsung: \"Sleeping\" / \"Deep sleeping apps\").\n6. Leave the phone plugged in for long deployments.</string>
     <string name="device_setup_battery">Battery settings</string>
