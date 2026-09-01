@@ -34,6 +34,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_settings);
+        org.havenapp.main.Utils.applyBarInsets(findViewById(R.id.settings_fragment), false, true, true);
 
         if (savedInstanceState == null) {
             mFragment = new SettingsFragment();

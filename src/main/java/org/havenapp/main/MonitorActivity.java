@@ -198,6 +198,7 @@ public class MonitorActivity extends AppCompatActivity implements TimePickerDial
     }
     private void initSetupLayout() {
         setContentView(R.layout.activity_monitor);
+        org.havenapp.main.Utils.applyBarInsets(findViewById(android.R.id.content), true, true, true);
         getOnBackPressedDispatcher().addCallback(this,
                 new androidx.activity.OnBackPressedCallback(true) {
                     @Override

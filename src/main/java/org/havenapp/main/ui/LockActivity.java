@@ -44,6 +44,7 @@ public class LockActivity extends AppCompatActivity {
         }
 
         setContentView(buildUi());
+        org.havenapp.main.Utils.applyBarInsets(findViewById(android.R.id.content), true, true, true);
         getOnBackPressedDispatcher().addCallback(this,
                 new androidx.activity.OnBackPressedCallback(true) {
                     @Override

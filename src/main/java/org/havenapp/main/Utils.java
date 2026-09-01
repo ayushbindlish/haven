@@ -5,7 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -54,6 +59,41 @@ public class Utils {
      */
     public static String getDateTime(Date date) {
         return new SimpleDateFormat(DATE_TIME_PATTERN, Locale.getDefault()).format(date);
+    }
+
+    /**
+     * Edge-to-edge (targetSdk 36+) helper: pad {@code v} to clear the status bar / nav
+     * bar / display cutout on the requested sides. Idempotent — the view's own padding at
+     * call time is treated as the baseline and the inset is added on top, so repeated
+     * inset dispatch doesn't accumulate.
+     */
+    public static void applyBarInsets(View v, boolean top, boolean bottom, boolean sides) {
+        final int baseL = v.getPaddingLeft(), baseT = v.getPaddingTop();
+        final int baseR = v.getPaddingRight(), baseB = v.getPaddingBottom();
+        ViewCompat.setOnApplyWindowInsetsListener(v, (view, wi) -> {
+            Insets i = wi.getInsets(WindowInsetsCompat.Type.systemBars()
+                    | WindowInsetsCompat.Type.displayCutout());
+            view.setPadding(baseL + (sides ? i.left : 0), baseT + (top ? i.top : 0),
+                    baseR + (sides ? i.right : 0), baseB + (bottom ? i.bottom : 0));
+            return wi;
+        });
+        ViewCompat.requestApplyInsets(v);
+    }
+
+    /** As {@link #applyBarInsets} but adds the bottom inset to the view's bottom margin
+     *  (for anchored views like a FloatingActionButton that use margin, not padding). */
+    public static void applyBottomMarginInset(View v) {
+        if (!(v.getLayoutParams() instanceof android.view.ViewGroup.MarginLayoutParams)) return;
+        final int baseBottom = ((android.view.ViewGroup.MarginLayoutParams) v.getLayoutParams()).bottomMargin;
+        ViewCompat.setOnApplyWindowInsetsListener(v, (view, wi) -> {
+            Insets i = wi.getInsets(WindowInsetsCompat.Type.systemBars());
+            android.view.ViewGroup.MarginLayoutParams lp =
+                    (android.view.ViewGroup.MarginLayoutParams) view.getLayoutParams();
+            lp.bottomMargin = baseBottom + i.bottom;
+            view.setLayoutParams(lp);
+            return wi;
+        });
+        ViewCompat.requestApplyInsets(v);
     }
 
     /**

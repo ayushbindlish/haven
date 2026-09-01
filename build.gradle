@@ -39,7 +39,7 @@ allprojects {
         group_info = "haven"
         buildToolsVersion = "36.0.0"
         minSdkVersion = 24
-        targetSdkVersion = 35
+        targetSdkVersion = 36
     }
 }
 
@@ -79,7 +79,7 @@ android {
         versionName getVersionName()
         archivesBaseName = "Haven-$versionName"
         minSdkVersion 24
-        targetSdkVersion 35
+        targetSdkVersion 36
         ndkVersion '28.2.13676358'
 
         multiDexEnabled true

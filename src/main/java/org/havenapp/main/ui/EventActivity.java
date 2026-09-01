@@ -72,6 +72,8 @@ public class EventActivity extends AppCompatActivity implements EventTriggerAdap
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
+        org.havenapp.main.Utils.applyBarInsets(findViewById(R.id.event_trigger_list), false, true, true);
+        org.havenapp.main.Utils.applyBottomMarginInset(findViewById(R.id.fab));
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

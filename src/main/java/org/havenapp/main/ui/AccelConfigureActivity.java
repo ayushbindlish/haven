@@ -72,6 +72,7 @@ public class AccelConfigureActivity extends AppCompatActivity implements SensorE
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_accel_configure);
+        org.havenapp.main.Utils.applyBarInsets(findViewById(android.R.id.content), true, true, true);
         mPrefManager = new PreferenceManager(this.getApplicationContext());
 
         Toolbar toolbar = findViewById(R.id.toolbar);

@@ -140,6 +140,9 @@ public class ListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+        org.havenapp.main.Utils.applyBarInsets(findViewById(R.id.main_list), false, true, true);
+        org.havenapp.main.Utils.applyBottomMarginInset(findViewById(R.id.fab));
+        org.havenapp.main.Utils.applyBarInsets(findViewById(R.id.empty_view), false, true, true);
         Log.d("Main", "onCreate");
 
         org.havenapp.main.security.PinManager pinManager =

@@ -37,6 +37,7 @@ public class MicrophoneConfigureActivity extends AppCompatActivity implements Mi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_microphone_configure);
+        org.havenapp.main.Utils.applyBarInsets(findViewById(android.R.id.content), true, true, true);
         mPrefManager = new PreferenceManager(this.getApplicationContext());
 
         Toolbar toolbar = findViewById(R.id.toolbar);

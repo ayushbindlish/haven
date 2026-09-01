@@ -64,6 +64,7 @@ public class CameraConfigureActivity extends AppCompatActivity {
     private void initLayout() {
         mPrefManager = new PreferenceManager(getApplicationContext());
         setContentView(R.layout.activity_camera_configure);
+        org.havenapp.main.Utils.applyBarInsets(findViewById(android.R.id.content), true, true, true);
         getOnBackPressedDispatcher().addCallback(this,
                 new androidx.activity.OnBackPressedCallback(true) {
                     @Override

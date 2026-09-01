@@ -30,6 +30,9 @@ public class PPAppIntro extends AppIntro {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // AppIntro 5.x predates edge-to-edge; pad its content clear of the bars.
+        org.havenapp.main.Utils.applyBarInsets(findViewById(android.R.id.content), true, true, true);
+
         // Configure intro animations and behavior
         setFadeAnimation();
         setWizardMode(true);
