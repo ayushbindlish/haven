@@ -263,7 +263,9 @@
         <!-- Auto-arm receivers -->
         <receiver android:name=".autoarm.ScheduleReceiver" android:exported="false" />
         <receiver android:name=".autoarm.AwayCheckReceiver" android:exported="false" />
-        <receiver android:name=".autoarm.UserPresentReceiver" android:exported="false">
+        <!-- USER_PRESENT is a protected system broadcast; a manifest receiver for it must
+             be exported for the system to deliver it. No other app can send it. -->
+        <receiver android:name=".autoarm.UserPresentReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
