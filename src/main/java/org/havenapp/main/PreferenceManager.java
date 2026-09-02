@@ -671,4 +671,150 @@ public class PreferenceManager {
     private String getCurrentSession() {
         return appSharedPrefs.getString(CURRENT_EVENT_START_TIME, "unknown_session");
     }
+
+    /* ------------------------------------------------------------------ auto-arm */
+
+    public boolean getAutoArmEnabled() {
+        return appSharedPrefs.getBoolean("auto_arm_enabled", false);
+    }
+
+    public void setAutoArmEnabled(boolean v) {
+        prefsEditor.putBoolean("auto_arm_enabled", v).commit();
+    }
+
+    /** JSON array of {"days":[1..7 Calendar.DAY_OF_WEEK],"armMin":H*60+M,"disarmMin":H*60+M}. */
+    public String getAutoArmSchedule() {
+        return appSharedPrefs.getString("auto_arm_schedule", "[]");
+    }
+
+    public void setAutoArmSchedule(String json) {
+        prefsEditor.putString("auto_arm_schedule", json).commit();
+    }
+
+    public boolean getAutoArmAwayEnabled() {
+        return appSharedPrefs.getBoolean("auto_arm_away_enabled", false);
+    }
+
+    public void setAutoArmAwayEnabled(boolean v) {
+        prefsEditor.putBoolean("auto_arm_away_enabled", v).commit();
+    }
+
+    public int getAutoArmAwayMinutes() {
+        return appSharedPrefs.getInt("auto_arm_away_minutes", 15);
+    }
+
+    public void setAutoArmAwayMinutes(int m) {
+        prefsEditor.putInt("auto_arm_away_minutes", Math.max(1, m)).commit();
+    }
+
+    /** Arm whenever the current location is not inside any place marked trusted. */
+    public boolean getAutoArmUntrustedLocation() {
+        return appSharedPrefs.getBoolean("auto_arm_untrusted_location", false);
+    }
+
+    public void setAutoArmUntrustedLocation(boolean v) {
+        prefsEditor.putBoolean("auto_arm_untrusted_location", v).commit();
+    }
+
+    /** JSON string array of trusted Wi-Fi SSIDs (no surrounding quotes). */
+    public String getTrustedSsids() {
+        return appSharedPrefs.getString("auto_arm_trusted_ssids", "[]");
+    }
+
+    public void setTrustedSsids(String json) {
+        prefsEditor.putString("auto_arm_trusted_ssids", json).commit();
+    }
+
+    /** JSON array of {"addr":"AA:BB:..","name":".."} bonded devices treated as "with me". */
+    public String getTrustedBtDevices() {
+        return appSharedPrefs.getString("auto_arm_trusted_bt", "[]");
+    }
+
+    public void setTrustedBtDevices(String json) {
+        prefsEditor.putString("auto_arm_trusted_bt", json).commit();
+    }
+
+    public boolean getAutoArmOnBtDisconnect() {
+        return appSharedPrefs.getBoolean("auto_arm_bt_disconnect", false);
+    }
+
+    public void setAutoArmOnBtDisconnect(boolean v) {
+        prefsEditor.putBoolean("auto_arm_bt_disconnect", v).commit();
+    }
+
+    public boolean getLockDeviceOnArm() {
+        return appSharedPrefs.getBoolean("lock_device_on_arm", false);
+    }
+
+    public void setLockDeviceOnArm(boolean v) {
+        prefsEditor.putBoolean("lock_device_on_arm", v).commit();
+    }
+
+    public boolean getLockAppOnArm() {
+        return appSharedPrefs.getBoolean("lock_app_on_arm", false);
+    }
+
+    public void setLockAppOnArm(boolean v) {
+        prefsEditor.putBoolean("lock_app_on_arm", v).commit();
+    }
+
+    public boolean getDisarmOnUnlock() {
+        return appSharedPrefs.getBoolean("disarm_on_unlock", false);
+    }
+
+    public void setDisarmOnUnlock(boolean v) {
+        prefsEditor.putBoolean("disarm_on_unlock", v).commit();
+    }
+
+    /** Silent photo capture on a tamper signal (wrong unlock, unlock-while-armed, PIN fail). */
+    public boolean getTamperCaptureEnabled() {
+        return appSharedPrefs.getBoolean("tamper_capture_enabled", false);
+    }
+
+    public void setTamperCaptureEnabled(boolean v) {
+        prefsEditor.putBoolean("tamper_capture_enabled", v).commit();
+    }
+
+    /** Set when the monitor was started by auto-arm (so only auto-arm auto-disarms it). */
+    public boolean getAutoArmed() {
+        return appSharedPrefs.getBoolean("auto_armed", false);
+    }
+
+    public void setAutoArmed(boolean v) {
+        prefsEditor.putBoolean("auto_armed", v).commit();
+    }
+
+    /** Transient: force the app PIN gate on next UI entry (set at arm, cleared on unlock). */
+    public boolean getArmedAppLock() {
+        return appSharedPrefs.getBoolean("armed_app_lock", false);
+    }
+
+    public void setArmedAppLock(boolean v) {
+        prefsEditor.putBoolean("armed_app_lock", v).commit();
+    }
+
+    public long getLastMotionTs() {
+        return appSharedPrefs.getLong("auto_arm_last_motion_ts", 0L);
+    }
+
+    public void setLastMotionTs(long t) {
+        prefsEditor.putLong("auto_arm_last_motion_ts", t).commit();
+    }
+
+    public long getScreenOffTs() {
+        return appSharedPrefs.getLong("auto_arm_screen_off_ts", 0L);
+    }
+
+    public void setScreenOffTs(long t) {
+        prefsEditor.putLong("auto_arm_screen_off_ts", t).commit();
+    }
+
+    /** JSON string array of BT MAC addresses currently connected (maintained from ACL broadcasts). */
+    public String getBtConnectedAddrs() {
+        return appSharedPrefs.getString("bt_connected_addrs", "[]");
+    }
+
+    public void setBtConnectedAddrs(String json) {
+        prefsEditor.putString("bt_connected_addrs", json).commit();
+    }
 }

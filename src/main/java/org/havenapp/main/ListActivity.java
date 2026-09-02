@@ -146,7 +146,8 @@ public class ListActivity extends AppCompatActivity {
 
         org.havenapp.main.security.PinManager pinManager =
                 new org.havenapp.main.security.PinManager(this);
-        if (pinManager.hasPin() && pinManager.isLockOnLaunch()
+        boolean armedLock = new PreferenceManager(this).getArmedAppLock();
+        if (pinManager.hasPin() && (pinManager.isLockOnLaunch() || armedLock)
                 && !org.havenapp.main.security.PinManager.unlockedThisProcess) {
             startActivityForResult(new android.content.Intent(this,
                     org.havenapp.main.ui.LockActivity.class), REQUEST_CODE_LOCK);

@@ -120,6 +120,27 @@ public class LocationTracker {
         void location(@Nullable Location loc);
     }
 
+    /**
+     * Cheap cached fix (no active request) for auto-arm evaluation. Calls back with null
+     * if there's no permission or no cached location — callers should treat that as
+     * "not in a trusted place".
+     */
+    @SuppressWarnings("MissingPermission")
+    public static void lastKnown(Context c, OnLocation cb) {
+        if (!hasPermission(c)) {
+            cb.location(null);
+            return;
+        }
+        try {
+            LocationServices.getFusedLocationProviderClient(c.getApplicationContext())
+                    .getLastLocation()
+                    .addOnSuccessListener(cb::location)
+                    .addOnFailureListener(e -> cb.location(null));
+        } catch (Exception e) {
+            cb.location(null);
+        }
+    }
+
     /* --------------------------------------------------------------- geofencing */
 
     private void onFix(Location loc) {

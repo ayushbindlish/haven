@@ -178,6 +178,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return true;
         });
 
+        wireAutoArm();
+
         Preference showQr = findPreference("supervised_show_qr");
         if (showQr != null) showQr.setOnPreferenceClickListener(p -> {
             startActivity(new Intent(mActivity, org.havenapp.main.pairing.SupervisedSetupActivity.class));
@@ -424,6 +426,23 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 org.havenapp.main.service.RemoveDeletedFilesWorker.runNow(mActivity);
                 break;
             }
+            case "auto_arm_away_minutes": {
+                EditTextPreference p = findPreference("auto_arm_away_minutes");
+                if (p != null) {
+                    int m = preferences.getAutoArmAwayMinutes();
+                    try { m = Integer.parseInt(p.getText().trim()); } catch (Exception ignored) {}
+                    preferences.setAutoArmAwayMinutes(m);
+                    p.setText(String.valueOf(preferences.getAutoArmAwayMinutes()));
+                }
+                syncAutoArm();
+                break;
+            }
+            case "auto_arm_enabled":
+            case "auto_arm_away_enabled":
+            case "auto_arm_untrusted_location":
+            case "auto_arm_bt_disconnect":
+                syncAutoArm();
+                break;
             case "remote_commands_enabled": {
                 SwitchPreference sw = findPreference("remote_commands_enabled");
                 if (sw != null && sw.isChecked()) {
@@ -571,6 +590,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     }
 
     private void saveCurrentPlace() {
+        saveCurrentPlace(false);
+    }
+
+    private void saveCurrentPlace(boolean trusted) {
         if (!org.havenapp.main.location.LocationTracker.hasPermission(mActivity)) {
             android.widget.Toast.makeText(mActivity, R.string.location_permission_needed,
                     android.widget.Toast.LENGTH_LONG).show();
@@ -593,14 +616,253 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                         if (name.isEmpty()) return;
                         new org.havenapp.main.location.GeofenceStore(mActivity).add(
                                 new org.havenapp.main.location.GeofenceStore.Place(
-                                        name, loc.getLatitude(), loc.getLongitude(), 150f));
+                                        name, loc.getLatitude(), loc.getLongitude(), 150f, trusted));
                         android.widget.Toast.makeText(mActivity,
-                                getString(R.string.place_saved, name),
+                                getString(trusted ? R.string.autoarm_trusted_place_added
+                                        : R.string.place_saved, name),
                                 android.widget.Toast.LENGTH_SHORT).show();
                     })
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
         });
+    }
+
+    private void syncAutoArm() {
+        org.havenapp.main.autoarm.AutoArmScheduler.sync(mActivity);
+        org.havenapp.main.autoarm.AwayWatcher.sync(mActivity);
+    }
+
+    private void wireAutoArm() {
+        Preference sched = findPreference("auto_arm_schedule_edit");
+        if (sched != null) {
+            sched.setSummary(scheduleSummary());
+            sched.setOnPreferenceClickListener(p -> {
+                showScheduleDialog();
+                return true;
+            });
+        }
+        Preference addTrusted = findPreference("auto_arm_trusted_place_add");
+        if (addTrusted != null) addTrusted.setOnPreferenceClickListener(p -> {
+            saveCurrentPlace(true);
+            return true;
+        });
+        Preference wifi = findPreference("auto_arm_trusted_wifi_add");
+        if (wifi != null) {
+            wifi.setSummary(listSummary(preferences.getTrustedSsids(), R.string.autoarm_trusted_wifi_none));
+            wifi.setOnPreferenceClickListener(p -> {
+                addCurrentWifi();
+                return true;
+            });
+        }
+        Preference bt = findPreference("auto_arm_trusted_bt_pick");
+        if (bt != null) {
+            bt.setSummary(btSummary());
+            bt.setOnPreferenceClickListener(p -> {
+                pickTrustedBt();
+                return true;
+            });
+        }
+    }
+
+    private String scheduleSummary() {
+        try {
+            org.json.JSONArray a = new org.json.JSONArray(preferences.getAutoArmSchedule());
+            if (a.length() == 0) return getString(R.string.autoarm_schedule_none);
+            org.json.JSONObject o = a.getJSONObject(0);
+            int arm = o.getInt("armMin"), dis = o.getInt("disarmMin");
+            org.json.JSONArray days = o.getJSONArray("days");
+            return getString(R.string.autoarm_schedule_set, hhmm(arm), hhmm(dis), daysLabel(days));
+        } catch (Exception e) {
+            return getString(R.string.autoarm_schedule_none);
+        }
+    }
+
+    private static String hhmm(int minOfDay) {
+        return String.format(java.util.Locale.US, "%02d:%02d", minOfDay / 60, minOfDay % 60);
+    }
+
+    private String daysLabel(org.json.JSONArray days) throws org.json.JSONException {
+        String[] names = {"", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+        if (days.length() == 7) return "every day";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < days.length(); i++) {
+            if (sb.length() > 0) sb.append(' ');
+            int d = days.getInt(i);
+            sb.append(d >= 1 && d <= 7 ? names[d] : String.valueOf(d));
+        }
+        return sb.toString();
+    }
+
+    private String listSummary(String jsonArray, int emptyRes) {
+        try {
+            org.json.JSONArray a = new org.json.JSONArray(jsonArray);
+            if (a.length() == 0) return getString(emptyRes);
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < a.length(); i++) {
+                if (sb.length() > 0) sb.append(", ");
+                sb.append(a.getString(i));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            return getString(emptyRes);
+        }
+    }
+
+    private String btSummary() {
+        try {
+            org.json.JSONArray a = new org.json.JSONArray(preferences.getTrustedBtDevices());
+            if (a.length() == 0) return getString(R.string.autoarm_trusted_bt_none);
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < a.length(); i++) {
+                if (sb.length() > 0) sb.append(", ");
+                sb.append(a.getJSONObject(i).optString("name", a.getJSONObject(i).optString("addr")));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            return getString(R.string.autoarm_trusted_bt_none);
+        }
+    }
+
+    private void addCurrentWifi() {
+        android.net.wifi.WifiManager wm = (android.net.wifi.WifiManager)
+                mActivity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        String ssid = null;
+        if (wm != null) {
+            @SuppressWarnings("deprecation")
+            android.net.wifi.WifiInfo info = wm.getConnectionInfo();
+            if (info != null && info.getSSID() != null) {
+                ssid = info.getSSID().replaceAll("^\"|\"$", "");
+            }
+        }
+        if (ssid == null || ssid.isEmpty()
+                || ssid.equals(android.net.wifi.WifiManager.UNKNOWN_SSID)) {
+            android.widget.Toast.makeText(mActivity, R.string.autoarm_trusted_wifi_none,
+                    android.widget.Toast.LENGTH_LONG).show();
+            return;
+        }
+        try {
+            org.json.JSONArray a = new org.json.JSONArray(preferences.getTrustedSsids());
+            for (int i = 0; i < a.length(); i++) if (ssid.equals(a.getString(i))) return;
+            a.put(ssid);
+            preferences.setTrustedSsids(a.toString());
+        } catch (Exception ignored) {
+        }
+        Preference wifi = findPreference("auto_arm_trusted_wifi_add");
+        if (wifi != null) wifi.setSummary(listSummary(preferences.getTrustedSsids(),
+                R.string.autoarm_trusted_wifi_none));
+        android.widget.Toast.makeText(mActivity, getString(R.string.autoarm_trusted_wifi_added, ssid),
+                android.widget.Toast.LENGTH_SHORT).show();
+    }
+
+    @SuppressWarnings("MissingPermission")
+    private void pickTrustedBt() {
+        android.bluetooth.BluetoothManager bm = (android.bluetooth.BluetoothManager)
+                mActivity.getSystemService(Context.BLUETOOTH_SERVICE);
+        android.bluetooth.BluetoothAdapter ad = bm != null ? bm.getAdapter() : null;
+        if (ad == null) return;
+        if (Build.VERSION.SDK_INT >= 31 && ContextCompat.checkSelfPermission(mActivity,
+                Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(mActivity,
+                    new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 0);
+            return;
+        }
+        java.util.List<android.bluetooth.BluetoothDevice> bonded =
+                new java.util.ArrayList<>(ad.getBondedDevices());
+        if (bonded.isEmpty()) {
+            android.widget.Toast.makeText(mActivity, R.string.autoarm_trusted_bt_none,
+                    android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String[] labels = new String[bonded.size()];
+        for (int i = 0; i < bonded.size(); i++) {
+            labels[i] = bonded.get(i).getName() + "  (" + bonded.get(i).getAddress() + ")";
+        }
+        new androidx.appcompat.app.AlertDialog.Builder(mActivity)
+                .setTitle(R.string.autoarm_trusted_bt_pick)
+                .setItems(labels, (d, which) -> {
+                    android.bluetooth.BluetoothDevice dev = bonded.get(which);
+                    try {
+                        org.json.JSONArray a = new org.json.JSONArray(preferences.getTrustedBtDevices());
+                        org.json.JSONArray b = new org.json.JSONArray();
+                        for (int i = 0; i < a.length(); i++) {
+                            if (!dev.getAddress().equals(a.getJSONObject(i).optString("addr"))) {
+                                b.put(a.getJSONObject(i));
+                            }
+                        }
+                        org.json.JSONObject o = new org.json.JSONObject();
+                        o.put("addr", dev.getAddress());
+                        o.put("name", dev.getName());
+                        b.put(o);
+                        preferences.setTrustedBtDevices(b.toString());
+                    } catch (Exception ignored) {
+                    }
+                    Preference bt = findPreference("auto_arm_trusted_bt_pick");
+                    if (bt != null) bt.setSummary(btSummary());
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void showScheduleDialog() {
+        android.view.View v = android.view.LayoutInflater.from(mActivity)
+                .inflate(R.layout.dialog_autoarm_schedule, null);
+        android.widget.TimePicker armPick = v.findViewById(R.id.arm_time);
+        android.widget.TimePicker disPick = v.findViewById(R.id.disarm_time);
+        armPick.setIs24HourView(true);
+        disPick.setIs24HourView(true);
+        final android.widget.CheckBox[] dayBoxes = {
+                v.findViewById(R.id.day_sun), v.findViewById(R.id.day_mon), v.findViewById(R.id.day_tue),
+                v.findViewById(R.id.day_wed), v.findViewById(R.id.day_thu), v.findViewById(R.id.day_fri),
+                v.findViewById(R.id.day_sat)
+        };
+        try {
+            org.json.JSONArray a = new org.json.JSONArray(preferences.getAutoArmSchedule());
+            if (a.length() > 0) {
+                org.json.JSONObject o = a.getJSONObject(0);
+                int arm = o.getInt("armMin"), dis = o.getInt("disarmMin");
+                armPick.setHour(arm / 60); armPick.setMinute(arm % 60);
+                disPick.setHour(dis / 60); disPick.setMinute(dis % 60);
+                org.json.JSONArray days = o.getJSONArray("days");
+                for (int i = 0; i < days.length(); i++) {
+                    int d = days.getInt(i);
+                    if (d >= 1 && d <= 7) dayBoxes[d - 1].setChecked(true);
+                }
+            } else {
+                for (android.widget.CheckBox cb : dayBoxes) cb.setChecked(true);
+            }
+        } catch (Exception e) {
+            for (android.widget.CheckBox cb : dayBoxes) cb.setChecked(true);
+        }
+        new androidx.appcompat.app.AlertDialog.Builder(mActivity)
+                .setTitle(R.string.autoarm_schedule_dialog_title)
+                .setView(v)
+                .setPositiveButton(android.R.string.ok, (d, w) -> {
+                    org.json.JSONArray days = new org.json.JSONArray();
+                    for (int i = 0; i < 7; i++) if (dayBoxes[i].isChecked()) days.put(i + 1);
+                    try {
+                        if (days.length() == 0) {
+                            preferences.setAutoArmSchedule("[]");
+                        } else {
+                            org.json.JSONObject o = new org.json.JSONObject();
+                            o.put("days", days);
+                            o.put("armMin", armPick.getHour() * 60 + armPick.getMinute());
+                            o.put("disarmMin", disPick.getHour() * 60 + disPick.getMinute());
+                            preferences.setAutoArmSchedule(new org.json.JSONArray().put(o).toString());
+                        }
+                    } catch (Exception ignored) {
+                    }
+                    Preference sp = findPreference("auto_arm_schedule_edit");
+                    if (sp != null) sp.setSummary(scheduleSummary());
+                    syncAutoArm();
+                })
+                .setNeutralButton(R.string.autoarm_schedule_clear, (d, w) -> {
+                    preferences.setAutoArmSchedule("[]");
+                    Preference sp = findPreference("auto_arm_schedule_edit");
+                    if (sp != null) sp.setSummary(scheduleSummary());
+                    syncAutoArm();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     private void showDuressPinDialog() {

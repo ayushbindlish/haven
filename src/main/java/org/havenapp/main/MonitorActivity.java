@@ -458,6 +458,10 @@ public class MonitorActivity extends AppCompatActivity implements TimePickerDial
             return;
         }
 
+        // Manual arm: not an auto-arm session, but still apply the on-arm lock actions.
+        preferences.setAutoArmed(false);
+        org.havenapp.main.autoarm.AutoArmController.onArmed(getApplicationContext(), preferences);
+
         try {
             // Use app-specific external directory instead of public external storage
             File fileImageDir = new File(getExternalFilesDir(null), preferences.getDefaultMediaStoragePath());

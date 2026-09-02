@@ -93,6 +93,7 @@ public class LockActivity extends AppCompatActivity {
                 input.setText("");
                 int fails = pin.failedCount();
                 error.setText(getString(R.string.pin_wrong, fails));
+                org.havenapp.main.autoarm.TamperCapture.fire(this, "wrong Haven PIN");
                 if (fails >= 5) {
                     new org.havenapp.main.security.AdminManager(this).lockNow();
                 }
@@ -131,7 +132,9 @@ public class LockActivity extends AppCompatActivity {
 
     private void unlock() {
         PinManager.unlockedThisProcess = true;
-        new org.havenapp.main.PreferenceManager(this).markCheckin(); // dead-man's switch check-in
+        org.havenapp.main.PreferenceManager prefs = new org.havenapp.main.PreferenceManager(this);
+        prefs.markCheckin(); // dead-man's switch check-in
+        prefs.setArmedAppLock(false);
         setResult(RESULT_OK);
         finish();
     }

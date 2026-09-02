@@ -6,6 +6,8 @@ import android.content.Intent;
 
 import org.havenapp.main.R;
 import org.havenapp.main.alerts.AlertManager;
+import org.havenapp.main.autoarm.AutoArmController;
+import org.havenapp.main.autoarm.TamperCapture;
 
 /**
  * Plain Device Admin (not Device Owner - no factory reset). It can't block uninstall
@@ -28,5 +30,24 @@ public class HavenDeviceAdminReceiver extends DeviceAdminReceiver {
                     .sendAlert(context.getString(R.string.admin_disabled_alert), null, -1);
         } catch (Exception ignored) {
         }
+    }
+
+    /** Wrong device-unlock attempt (needs the watch-login policy, which we declare). */
+    @Override
+    public void onPasswordFailed(Context context, Intent intent) {
+        super.onPasswordFailed(context, intent);
+        TamperCapture.fire(context, "wrong device-unlock attempt");
+    }
+
+    /** The device was unlocked. Grab evidence if armed, then honour disarm-on-unlock. */
+    @Override
+    public void onPasswordSucceeded(Context context, Intent intent) {
+        super.onPasswordSucceeded(context, intent);
+        org.havenapp.main.service.MonitorService svc =
+                org.havenapp.main.service.MonitorService.getInstance();
+        if (svc != null && svc.isRunning()) {
+            TamperCapture.fire(context, "device unlocked while armed");
+        }
+        AutoArmController.onUserUnlocked(context);
     }
 }

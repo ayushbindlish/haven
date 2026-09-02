@@ -524,4 +524,96 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        android:title="@string/autoarm_category">
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="auto_arm_enabled"
+            android:title="@string/autoarm_enabled_title"
+            android:summary="@string/autoarm_enabled_summary" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            android:key="auto_arm_schedule_edit"
+            android:title="@string/autoarm_schedule_title"
+            android:summary="@string/autoarm_schedule_summary" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="auto_arm_away_enabled"
+            android:title="@string/autoarm_away_title"
+            android:summary="@string/autoarm_away_summary" />
+
+        <EditTextPreference
+            app:iconSpaceReserved="false"
+            android:key="auto_arm_away_minutes"
+            android:inputType="number"
+            android:defaultValue="15"
+            android:title="@string/autoarm_away_minutes_title" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="auto_arm_untrusted_location"
+            android:title="@string/autoarm_untrusted_title"
+            android:summary="@string/autoarm_untrusted_summary" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            android:key="auto_arm_trusted_place_add"
+            android:title="@string/autoarm_trusted_place_add" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            android:key="auto_arm_trusted_wifi_add"
+            android:title="@string/autoarm_trusted_wifi_title"
+            android:summary="@string/autoarm_trusted_wifi_none" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            android:key="auto_arm_trusted_bt_pick"
+            android:title="@string/autoarm_trusted_bt_title"
+            android:summary="@string/autoarm_trusted_bt_none" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="auto_arm_bt_disconnect"
+            android:title="@string/autoarm_bt_disconnect_title"
+            android:summary="@string/autoarm_bt_disconnect_summary" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="lock_device_on_arm"
+            android:title="@string/autoarm_lock_device_title"
+            android:summary="@string/autoarm_lock_device_summary" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="lock_app_on_arm"
+            android:title="@string/autoarm_lock_app_title"
+            android:summary="@string/autoarm_lock_app_summary" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="disarm_on_unlock"
+            android:title="@string/autoarm_disarm_on_unlock_title"
+            android:summary="@string/autoarm_disarm_on_unlock_summary" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="tamper_capture_enabled"
+            android:title="@string/autoarm_tamper_capture_title"
+            android:summary="@string/autoarm_tamper_capture_summary" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

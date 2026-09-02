@@ -86,6 +86,7 @@
     <string name="sensor_bump">Bump (Accelerometer)</string>
     <string name="sensor_camera_video">Motion (Video)</string>
     <string name="sensor_heartbeat">Heartbeat</string>
+    <string name="sensor_tamper">Tamper</string>
     <string name="sensor_unknown">Unknown</string>
     <string name="settings">Settings</string>
     <string name="remote_access_onion_error">This feature requires the Orbot: Tor for Android app to be installed.</string>
@@ -357,5 +358,51 @@
     <string name="device_setup_body">Many phones aggressively stop background apps. For reliable monitoring, apply whichever of these your phone offers:\n\n1. Battery optimisation: exempt Haven (%1$s).\n2. App info → Battery → set to \"Unrestricted\" / \"No restrictions\".\n3. App info → turn off \"Pause app activity if unused\" (Samsung) / \"Remove permissions and free up space\" (Pixel).\n4. App info → Permissions → turn off \"Remove permissions if app is unused\".\n5. Battery → Background usage limits → make sure Haven is NOT listed as \"Sleeping\" / \"Restricted\" (Samsung: \"Sleeping\" / \"Deep sleeping apps\").\n6. Leave the phone plugged in for long deployments.</string>
     <string name="device_setup_battery">Battery settings</string>
     <string name="device_setup_appinfo">App info</string>
+
+    <!-- Auto-arm -->
+    <string name="autoarm_category">Auto-arm</string>
+    <string name="autoarm_enabled_title">Auto-arm</string>
+    <string name="autoarm_enabled_summary">Let Haven arm itself from the triggers below. Needs battery set to Unrestricted, plus camera/mic/location permissions.</string>
+    <string name="autoarm_schedule_title">Schedule…</string>
+    <string name="autoarm_schedule_summary">Arm and disarm at set times on chosen days</string>
+    <string name="autoarm_schedule_dialog_title">Arm schedule</string>
+    <string name="autoarm_schedule_days">Days</string>
+    <string name="autoarm_schedule_arm_at">Arm at</string>
+    <string name="autoarm_schedule_disarm_at">Disarm at</string>
+    <string name="autoarm_schedule_none">No schedule set</string>
+    <string name="autoarm_schedule_set">%1$s  →  %2$s   (%3$s)</string>
+    <string name="autoarm_schedule_clear">Clear schedule</string>
+    <string name="autoarm_away_title">Arm when left undisturbed</string>
+    <string name="autoarm_away_summary">Arm after the screen has been off this many minutes and no trusted Wi-Fi / Bluetooth is nearby</string>
+    <string name="autoarm_away_minutes_title">Undisturbed minutes</string>
+    <string name="autoarm_untrusted_title">Arm when away from trusted places</string>
+    <string name="autoarm_untrusted_summary">Arm whenever the phone is not inside a place marked trusted. Add your home/office first.</string>
+    <string name="autoarm_trusted_place_add">Mark current location as trusted…</string>
+    <string name="autoarm_trusted_place_added">Trusted place \"%1$s\" saved</string>
+    <string name="autoarm_trusted_place_none">No trusted places yet</string>
+    <string name="autoarm_trusted_place_clear">Clear trusted places</string>
+    <string name="autoarm_trusted_wifi_title">Trusted Wi-Fi networks</string>
+    <string name="autoarm_trusted_wifi_add">Add the network I\'m on now…</string>
+    <string name="autoarm_trusted_wifi_added">Added \"%1$s\"</string>
+    <string name="autoarm_trusted_wifi_none">None — connect to a network and add it</string>
+    <string name="autoarm_trusted_wifi_clear">Clear trusted Wi-Fi</string>
+    <string name="autoarm_trusted_bt_title">Trusted Bluetooth device</string>
+    <string name="autoarm_trusted_bt_pick">Pick a paired device…</string>
+    <string name="autoarm_trusted_bt_none">None selected</string>
+    <string name="autoarm_bt_disconnect_title">Arm when trusted device leaves</string>
+    <string name="autoarm_bt_disconnect_summary">Arm the moment the trusted Bluetooth device disconnects (e.g. your watch)</string>
+    <string name="autoarm_lock_device_title">Lock the screen when arming</string>
+    <string name="autoarm_lock_device_summary">If the phone is unlocked, force the OS lock screen. Needs Haven Device Admin + a screen lock.</string>
+    <string name="autoarm_lock_app_title">Lock the Haven app when arming</string>
+    <string name="autoarm_lock_app_summary">Require the Haven PIN to open the app while armed</string>
+    <string name="autoarm_disarm_on_unlock_title">Disarm when I unlock the phone</string>
+    <string name="autoarm_disarm_on_unlock_summary">A successful device unlock (face / fingerprint / PIN) stands the monitor down</string>
+    <string name="autoarm_tamper_capture_title">Silent capture on tamper</string>
+    <string name="autoarm_tamper_capture_summary">While armed, a wrong device-unlock, an unlock, or a wrong Haven PIN grabs a photo with the screen off</string>
+    <string name="autoarm_armed_alert">Haven auto-armed: %1$s</string>
+    <string name="autoarm_disarmed_unlock">Haven disarmed — device unlocked</string>
+    <string name="autoarm_blocked_notice">Tap to arm Haven — the system blocked a background start</string>
+    <string name="autoarm_need_location">Add a trusted place: location permission or a location fix is unavailable</string>
+    <string name="autoarm_need_admin">Turn on Haven Device Admin first (Security section) so it can lock the screen</string>
 
 </resources>

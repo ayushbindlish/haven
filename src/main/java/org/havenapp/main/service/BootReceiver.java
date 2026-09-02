@@ -26,6 +26,12 @@ public class BootReceiver extends BroadcastReceiver {
         }
 
         PreferenceManager prefs = new PreferenceManager(context);
+
+        // Auto-arm survives reboot: BT-connected set is stale, re-point the alarms.
+        org.havenapp.main.autoarm.AutoArmController.clearBtConnections(context);
+        org.havenapp.main.autoarm.AutoArmScheduler.sync(context);
+        org.havenapp.main.autoarm.AwayWatcher.sync(context);
+
         if (!prefs.getBootResumeEnabled() || !prefs.getMonitorServiceActive()) return;
 
         ResumeNotifier.post(context, context.getString(R.string.resume_monitoring_text));

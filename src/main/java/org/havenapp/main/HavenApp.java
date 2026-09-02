@@ -63,6 +63,9 @@ public class HavenApp extends MultiDexApplication {
         org.havenapp.main.service.DeadmanWorker.reschedule(this);
         org.havenapp.main.service.BackupWorker.reschedule(this);
         org.havenapp.main.service.SupervisorWorker.reschedule(this);
+        // Auto-arm: re-point the schedule alarm + "away" sampler at the current config.
+        org.havenapp.main.autoarm.AutoArmScheduler.sync(this);
+        org.havenapp.main.autoarm.AwayWatcher.sync(this);
         // Bring up built-in Tor if it's enabled and something routes through it.
         org.havenapp.main.net.TorController.reconcile(this);
         // Retry any alerts that failed to send before the process last died.

@@ -378,6 +378,16 @@ public class MonitorService extends LifecycleService implements SensorTriggerSin
         if (mCoordinator != null) mCoordinator.requestPhoto();
     }
 
+    /**
+     * Record a tamper trigger and grab a silent still (screen stays off). Called from the
+     * Device Admin password callbacks and the app lock screen.
+     */
+    public void tamper(String reason) {
+        if (!mIsMonitoringActive) return;
+        alert(EventTrigger.TAMPER, reason == null ? "tamper" : reason);
+        if (mCoordinator != null) mCoordinator.requestPhoto();
+    }
+
     /** Called by {@link PowerConnectionReceiver} when the charger is plugged / unplugged. */
     public void onPowerConnectivityChanged(boolean charging) {
         if (mCoordinator != null) {

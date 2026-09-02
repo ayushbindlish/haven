@@ -57,6 +57,11 @@ class EventTrigger {
          * Heartbeat notification message
          */
         const val HEART = 8
+
+        /**
+         * Tamper signal (wrong device unlock, unlock while armed, Haven PIN failure)
+         */
+        const val TAMPER = 9
     }
 
     @PrimaryKey(autoGenerate = true)
@@ -88,6 +93,7 @@ class EventTrigger {
             BUMP -> resourceManager.getString(R.string.sensor_bump)
             CAMERA_VIDEO -> resourceManager.getString(R.string.sensor_camera_video)
             HEART -> resourceManager.getString(R.string.sensor_heartbeat)
+            TAMPER -> resourceManager.getString(R.string.sensor_tamper)
             else -> resourceManager.getString(R.string.sensor_unknown)
         }
 
