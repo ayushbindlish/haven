@@ -57,7 +57,7 @@ public class PPAppIntro extends AppIntro {
                 getString(R.string.intro1_title),
                 getString(R.string.intro1_desc),
                 R.drawable.web_hi_res_512,
-                ContextCompat.getColor(this, R.color.colorPrimaryDark),
+                R.color.colorPrimaryDark, // @ColorRes in AppIntro 6
                 0, 0, 0, 0, 0
         ));
 
@@ -105,7 +105,7 @@ public class PPAppIntro extends AppIntro {
                 getString(R.string.intro5_title),
                 getString(R.string.intro5_desc),
                 R.drawable.web_hi_res_512,
-                ContextCompat.getColor(this, R.color.colorPrimaryDark),
+                R.color.colorPrimaryDark, // @ColorRes in AppIntro 6
                 0, 0, 0, 0, 0
         ));
 
