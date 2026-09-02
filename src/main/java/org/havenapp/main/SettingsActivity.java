@@ -40,8 +40,9 @@ public class SettingsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.action_settings);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        org.havenapp.main.Utils.applyBarInsets(toolbar, true, false, true);
-        org.havenapp.main.Utils.applyBarInsets(findViewById(R.id.settings_fragment), false, true, true);
+        // The root is a plain LinearLayout (no fitsSystemWindows), so insets aren't
+        // dispatched to individual children — pad the content frame as a whole.
+        org.havenapp.main.Utils.applyBarInsets(findViewById(android.R.id.content), true, true, true);
 
         if (savedInstanceState == null) {
             mFragment = new SettingsFragment();
