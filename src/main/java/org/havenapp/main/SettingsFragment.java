@@ -426,8 +426,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 org.havenapp.main.service.RemoveDeletedFilesWorker.runNow(mActivity);
                 break;
             }
-            case "auto_arm_away_minutes": {
-                EditTextPreference p = findPreference("auto_arm_away_minutes");
+            case "auto_arm_away_minutes_text": {
+                EditTextPreference p = findPreference("auto_arm_away_minutes_text");
                 if (p != null) {
                     int m = preferences.getAutoArmAwayMinutes();
                     try { m = Integer.parseInt(p.getText().trim()); } catch (Exception ignored) {}
@@ -633,6 +633,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     }
 
     private void wireAutoArm() {
+        EditTextPreference away = findPreference("auto_arm_away_minutes_text");
+        if (away != null && (away.getText() == null || away.getText().isEmpty())) {
+            away.setText(String.valueOf(preferences.getAutoArmAwayMinutes()));
+        }
         Preference sched = findPreference("auto_arm_schedule_edit");
         if (sched != null) {
             sched.setSummary(scheduleSummary());

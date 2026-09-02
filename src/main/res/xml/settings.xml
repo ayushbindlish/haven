@@ -550,7 +550,7 @@
 
         <EditTextPreference
             app:iconSpaceReserved="false"
-            android:key="auto_arm_away_minutes"
+            android:key="auto_arm_away_minutes_text"
             android:inputType="number"
             android:defaultValue="15"
             android:title="@string/autoarm_away_minutes_title" />
