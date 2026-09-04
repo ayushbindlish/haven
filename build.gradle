@@ -46,6 +46,14 @@ allprojects {
     }
 }
 
+// Release signing: credentials live in keystore.properties (git-ignored). Without that
+// file the release build stays unsigned, so CI / a fresh clone still builds.
+def keystorePropsFile = rootProject.file("keystore.properties")
+def keystoreProps = new Properties()
+if (keystorePropsFile.exists()) {
+    keystoreProps.load(new FileInputStream(keystorePropsFile))
+}
+
 android {
 
     tasks.withType(JavaCompile) {
@@ -53,6 +61,20 @@ android {
     }
 
     compileSdk 36
+
+    signingConfigs {
+        if (keystorePropsFile.exists()) {
+            release {
+                storeFile file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+                enableV1Signing false   // minSdk 24 -> v1 (JAR) not needed
+                enableV2Signing true
+                enableV3Signing true
+            }
+        }
+    }
 
     buildFeatures {
         viewBinding true
@@ -108,6 +130,9 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.txt'
+            if (keystorePropsFile.exists()) {
+                signingConfig signingConfigs.release
+            }
         }
         debug {
             // keep debug builds fast + fully inspectable

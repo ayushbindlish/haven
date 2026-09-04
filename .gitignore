@@ -69,3 +69,8 @@ captures/
 # Local dev notes (not for the repo)
 DEV_*.md
 *.local.md
+
+# release signing (local only)
+keystore.properties
+*.keystore
+*.jks
